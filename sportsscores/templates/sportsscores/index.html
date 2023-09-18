@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load static %}
+
+
+{% block title %} Sports Scores {% endblock %}
+
+{% block content %}
+<h2 class="text-center"> Homepage </h2>
+
+{% load tz %}
+<p>Current Time: {% now "SHORT_DATETIME_FORMAT" %} --- {% now "jS F Y H:i" %}</p>
+
+<table>
+<!-- For Chelsea's Schedule -->
+<!--
+{% for game in Premier_League_Chelsea_Games %}
+
+
+    
+    {% if game.status == 'Now' %}
+        <div class="row justify-content-center text-success">
+
+            <p class="col-md-2 text-end"> {{ game.home_team }} </p>
+
+            {% if game.home_score == None %}
+                <p class="col-md-1 text-center"> V </p>
+            {% else %}
+                <p class="col-md-1 text-center"> 
+                    {{ game.home_score }} - {{ game.away_score }}
+                </p>
+            {% endif %}
+            <p class="col-md-2 text-lg-right"> {{ game.away_team }} </p>
+
+
+        </div>  
+        <div class="row justify-content-center">
+            <p class="col-md-5 text-center"> {{ game.date }} </p>
+        </div>
+    
+    {% else %}
+        <div class="row justify-content-center">
+
+            <p class="col-md-2 text-end"> {{ game.home_team }} </p>
+
+            {% if game.home_score == None %}
+                <p class="col-md-1 text-center"> V </p>
+            {% else %}
+                <p class="col-md-1 text-center"> 
+                    {{ game.home_score }} - {{ game.away_score }}
+                </p>
+            {% endif %}
+            <p class="col-md-2 text-lg-right"> {{ game.away_team }} </p>
+
+
+        </div>  
+        <div class="row justify-content-center">
+            <p class="col-md-5 text-center"> {{ game.date }} </p>
+        </div>
+    {%endif%}
+
+
+
+
+
+    <br><br><br>
+{% endfor %}
+    -->
+
+    {% for game in Premier_League_Chelsea_Games %}
+
+        <div class="row justify-content-center">
+
+            <p class="col-md-2 text-end"> {{ game.home_team }} </p>
+
+            {% if game.home_score == None %}
+                <p class="col-md-1 text-center"> V </p>
+            {% else %}
+                <p class="col-md-1 text-center"> 
+                    {{ game.home_score }} - {{ game.away_score }}
+                </p>
+            {% endif %}
+            <p class="col-md-2 text-lg-right"> {{ game.away_team }} </p>
+
+
+        </div>  
+        <div class="row justify-content-center">
+            <p class="col-md-5 text-center"> {{ game.date }} </p>
+        </div>
+        <div class="row justify-content-center">
+            <p class="col-md-5 text-center"> {{ game.week }} </p>
+        </div>
+        <br>
+
+{% endfor %}
+
+
+
+
+{% endblock %}
