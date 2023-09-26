@@ -9,6 +9,7 @@ from django.utils import timezone
 from datetime import datetime
 import pytz
 
+from .models import League, Team, TeamLeague
 
 timezone = pytz.timezone('America/New_York')
 
@@ -82,19 +83,50 @@ def download_schedule():
     response = requests.request("GET", url, headers=headers, params=querystring)
     
 
-# Create your views here.
-def index(request):
-
-    
-
-    # Get the schedule for offline mode
+# These are temporary functions to load data
+#   into the models for 'testing'
+def load_league_json_into_class():
+    print("Loading data...")
     f = open( 'NFL_Schedule.json')
     data = json.load( f )
     print("Loading NFL...")
 
 
+    print("Loading data")
+    f = open( 'PremierLeague.json')
+    data = json.load( f )
+    new_object = League(api_id=39, name="Premier League", json_data=data)
+    new_object.save()
+    print("Loading Premier League...")
 
-    context_array = []
+def load_team_json_into_class():
+    new_object = Team(name="Chelsea", sport="SOCCER")
+    new_object.save()
+
+def load_teamleague():
+    team = Team.objects.get(pk=1)
+    league = League.objects.get(pk=32)
+    team_api_id = 49
+
+    all_games = league.json_data
+    chelsea_games = []
+    
+    for game in all_games:
+        if( game['teams']['home']['id'] == 49 or game['teams']['away']['id'] == 49):
+            chelsea_games.append(game)
+    
+
+    new_object = TeamLeague(team=team, league=league, team_api_id=49, json_data=chelsea_games)
+    new_object.save()
+
+
+# Create your views here.
+def index(request):
+
+
+    #load_team_json_into_class()
+
+
 
     #formattedTime = formatTime( data[0]['fixture']['date'] )
 
@@ -136,7 +168,7 @@ def index(request):
                 break
     """
 
-
+    """
     # Load Chelsea games into the dict
     
         
@@ -208,6 +240,57 @@ def index(request):
     context = {
         "Premier_League_Chelsea_Games" : sorted_context_array
     }
+
+    """
+
+    #load_json_into_class()
+    
+    f = open( 'PremierLeague.json')
+    data = json.load( f )
+    pretty_schedule = json.dumps(data, indent=4)
+    #response = requests.request("GET", url_soccer, headers=headers_soccer, params=querystring_soccer)
+
+    #data = json.loads( response.text )
+
+    #print( pretty_schedule )
+    #print("\n\n\n\n\n\n\n\n\n")
+
+    #ew_object = League(api_id=39, name="Premier League", sport="Soccer", json_data=data )
+    
+
+
+
+
+    """j = League.objects.latest('pk')
+
+    all_d = j.json_data
+
+    
+    for i in all_d:
+        if( i['teams']['home']['id'] == 49 or i['teams']['away']['id'] == 49):
+            print( "From OBJECTC: \n\n", i , "\n\n\n\n\n\n\n")
+    """
+
+
+    """context = {
+        "Json_Data" : j
+    }"""
+
+
+    #load_teamleague()
+
+
+    context = {}
+
+    # Load context with leagues
+    leagues = League.objects.all()
+
+    for league in leagues:
+        context[league.name] = league.json_data
+
+    
+    #print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPrinting context")
+    #print( context )
 
 
     return render(request, "sportsscores/index.html", context)

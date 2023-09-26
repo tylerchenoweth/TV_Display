@@ -66,34 +66,41 @@
 {% endfor %}
     -->
 
-    {% for game in Premier_League_Chelsea_Games %}
+<!--
+{% for game in Premier_League_Chelsea_Games %}
 
-        <div class="row justify-content-center">
+    <div class="row justify-content-center">
 
-            <p class="col-md-2 text-end"> {{ game.home_team }} </p>
+        <p class="col-md-2 text-end"> {{ game.home_team }} </p>
 
-            {% if game.home_score == None %}
-                <p class="col-md-1 text-center"> V </p>
-            {% else %}
-                <p class="col-md-1 text-center"> 
-                    {{ game.home_score }} - {{ game.away_score }}
-                </p>
-            {% endif %}
-            <p class="col-md-2 text-lg-right"> {{ game.away_team }} </p>
+        {% if game.home_score == None %}
+            <p class="col-md-1 text-center"> V </p>
+        {% else %}
+            <p class="col-md-1 text-center"> 
+                {{ game.home_score }} - {{ game.away_score }}
+            </p>
+        {% endif %}
+        <p class="col-md-2 text-lg-right"> {{ game.away_team }} </p>
 
 
-        </div>  
-        <div class="row justify-content-center">
-            <p class="col-md-5 text-center"> {{ game.date }} </p>
-        </div>
-        <div class="row justify-content-center">
-            <p class="col-md-5 text-center"> {{ game.week }} </p>
-        </div>
-        <br>
+    </div>  
+    <div class="row justify-content-center">
+        <p class="col-md-5 text-center"> {{ game.date }} </p>
+    </div>
+    <div class="row justify-content-center">
+        <p class="col-md-5 text-center"> {{ game.week }} </p>
+    </div>
+    <br>
 
 {% endfor %}
+-->
 
 
+
+
+
+
+<p> {{ Json_Data.json_data }}</p>
 
 
 {% endblock %}
