@@ -287,12 +287,12 @@ def index(request):
 
     for league in leagues:
         print(league.name,"\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-        context[league.name.replace(' ','_')] = league.json_data
+        context[league.get_dict_key_name()] = league.json_data
 
     teamleague = TeamLeague.objects.all()
 
     for team in teamleague:
-        context[team.team.name.replace(' ','_')] = team.json_data
+        context[team.get_dict_key_name()] = team.json_data
 
     
     for c in context:
