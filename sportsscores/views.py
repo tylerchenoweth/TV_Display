@@ -279,29 +279,52 @@ def index(request):
 
     #load_teamleague()
 
-
+    print("##################### START INDEX #####################")
     context = {}
 
     # Load context with leagues
     leagues = League.objects.all()
 
     for league in leagues:
-        print(league.name,"\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        #print(league.name,"\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
         context[league.get_dict_key_name()] = league.json_data
+        games_raw_data = league.get_next_game()
+
+        tmp_context = []
+
+        for game in games_raw_data:
+            tmp_dict = {
+                'home_team': game['teams']['home']['name'],
+                'away_team': game['teams']['away']['name'],
+
+                'date': game['fixture']['date'],
+            }
+
+            tmp_context.append(tmp_dict)
+
+        context[league.get_dict_key_name()] = tmp_context
+
+
+
+
+
+
+
+
+
+
 
     teamleague = TeamLeague.objects.all()
 
     for team in teamleague:
-        context[team.get_dict_key_name()] = team.json_data
-
+        context[team.get_dict_key_name()] = team.get_next_game()
     
-    for c in context:
-        print( c )
+    
 
     #print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPrinting context")
     #print( context )
 
-
+    print("##################### END INDEX #######################")
     return render(request, "sportsscores/index.html", context)
 
 
