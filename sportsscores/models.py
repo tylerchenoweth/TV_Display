@@ -27,6 +27,111 @@ class League(models.Model):
     sport = models.CharField(max_length=15, choices=SPORT_TYPE, default=SOCCER, blank=True)
     json_data = models.JSONField(default=default_json)
 
+
+
+    # Format the time for the game into a dictionary
+    def format_time_soccer( self, unformattedTime ):
+
+        time_chunks = {}
+
+        # The int() is to convert the json into int so it
+        #   can be compared to the current time dict
+        time_chunks['Year'] = int(unformattedTime[0:4])
+        time_chunks['Month'] = int(unformattedTime[5:7])
+        time_chunks['Day'] = int(unformattedTime[8:10])
+        time_chunks['Hour'] = int(unformattedTime[11:13])
+        time_chunks['Minute'] = int(unformattedTime[14:16])
+
+        return time_chunks
+
+    # Send a game schedule to determine if the game is 
+    #   in the future 
+    def is_future_game(self, current_time, game_time):
+        
+        is_future_game = False
+
+        if( current_time['Year'] < game_time['Year'] ):
+            return True
+        elif( current_time['Year'] == game_time['Year'] ):  
+            if( current_time['Month'] < game_time['Month'] ):
+                return True
+            elif( current_time['Month'] == game_time['Month'] ):
+                if( current_time['Day'] < game_time['Day'] ):
+                    return True
+                elif( current_time['Day'] == game_time['Day'] ):
+                    if( current_time['Hour'] < game_time['Hour'] ):
+                        return True
+                    elif( current_time['Hour'] == game_time['Hour'] ):
+                        if( current_time['Minute'] <= game_time['Minute'] ):
+                            return True
+        return False
+
+
+    def get_next_game(self):
+        print("Finding next game...")
+
+        # Get the current date and time
+        current_time = datetime.now()
+
+        # Breakdown the current date and time into dictionary keys
+        current_time_chunks = {}
+        current_time_chunks['Year'] = current_time.year
+        current_time_chunks['Month'] = current_time.month
+        current_time_chunks['Day'] = current_time.day
+        current_time_chunks['Hour'] = current_time.hour
+        current_time_chunks['Minute'] = current_time.minute
+        
+
+        all_team_IDs = []
+        
+        # Get all team IDs
+        for j in self.json_data:
+            if j['teams']['home']['id'] not in all_team_IDs:
+                all_team_IDs.append( j['teams']['home']['id'] )
+            if j['teams']['away']['id'] not in all_team_IDs:
+                all_team_IDs.append( j['teams']['away']['id'] )
+        
+        print( all_team_IDs )
+
+        all_next_games = []
+
+        for team_ID in all_team_IDs:
+            for game in self.json_data:
+                if( game['teams']['home']['id'] == team_ID or game['teams']['away']['id'] == team_ID ):
+                    print("###########################################################")
+                    #print(game['fixture']['date'])
+
+                    game_time_chunks = self.format_time_soccer( game['fixture']['date'] )
+
+                    #print( self.is_future_game( current_time_chunks, game_time_chunks ) )
+
+                    print("###########################################################")
+
+                    if( self.is_future_game( current_time_chunks, game_time_chunks ) ):
+                        all_next_games.append( game )
+                        
+                        break
+            print("NEW TEAM ID")
+
+
+        print("\n\n\n")
+
+        unique_list = [item for index, item in enumerate(all_next_games) if item not in all_next_games[:index]]
+
+        for game in all_next_games:
+            print( game['teams']['home']['name'], 'V', game['teams']['away']['name'])
+
+        print("\n")
+
+        for u in unique_list:
+            print( u['teams']['home']['name'], 'V', u['teams']['away']['name'])
+
+        print("\n\n\n")
+        
+        return unique_list
+
+        
+
     def get_dict_key_name(self):
         return self.name.replace(' ','_')
 
@@ -66,15 +171,13 @@ class TeamLeague(models.Model):
     json_data = models.JSONField(default=default_json)
 
     
+    # Format the time for the game into a dictionary
     def format_time_soccer( self, unformattedTime ):
-        print("FORMATTED TIME\n\n\n\n\n\n\n")
-
-        print("Current Time: ", datetime.now() )
-
-        print("Unformatted Time: ", unformattedTime)
 
         time_chunks = {}
 
+        # The int() is to convert the json into int so it
+        #   can be compared to the current time dict
         time_chunks['Year'] = int(unformattedTime[0:4])
         time_chunks['Month'] = int(unformattedTime[5:7])
         time_chunks['Day'] = int(unformattedTime[8:10])
@@ -83,6 +186,8 @@ class TeamLeague(models.Model):
 
         return time_chunks
 
+    # Send a game schedule to determine if the game is 
+    #   in the future 
     def is_future_game(self, current_time, game_time):
         
         is_future_game = False
@@ -104,8 +209,8 @@ class TeamLeague(models.Model):
         return False
 
 
-    def get_next_game(self, full_team_schedule):
-        print("Finding next game...")
+    def get_next_game(self):
+        #print("Finding next game...")
 
         # Get the current date and time
         current_time = datetime.now()
@@ -119,18 +224,21 @@ class TeamLeague(models.Model):
         current_time_chunks['Minute'] = current_time.minute
         
 
-        for game in full_team_schedule:
-            print("###########################################################")
-            print(game['fixture']['date'])
+        for game in self.json_data:
+            #print("###########################################################")
+            #print(game['fixture']['date'])
 
             game_time_chunks = self.format_time_soccer( game['fixture']['date'] )
 
-            print( self.is_future_game( current_time_chunks, game_time_chunks ) )
+            #print( self.is_future_game( current_time_chunks, game_time_chunks ) )
 
-            print("###########################################################")
+            #print("###########################################################")
 
+            if( self.is_future_game( current_time_chunks, game_time_chunks ) ):
+                print(current_time)
+                return game
 
-        print(current_time)
+        
 
 
 
@@ -138,7 +246,7 @@ class TeamLeague(models.Model):
     #   dict and it doesnt like it when key names have spaces.
     #   so this
     def get_dict_key_name(self):
-        self.get_next_game(self.json_data)
+        self.get_next_game()
         return self.team.name.replace(' ','_')
 
     class Meta:
