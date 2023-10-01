@@ -86,17 +86,19 @@ def download_schedule():
 # These are temporary functions to load data
 #   into the models for 'testing'
 def load_league_json_into_class():
-    print("Loading data...")
+    print("Loading NFL data...")
     f = open( 'NFL_Schedule.json')
     data = json.load( f )
+    new_object = League(api_id=1, name="NFL", sport="FOOTBALL", json_data=data)
+    new_object.save()
     print("Loading NFL...")
 
 
     print("Loading data")
     f = open( 'PremierLeague.json')
     data = json.load( f )
-    new_object = League(api_id=39, name="Premier League", json_data=data)
-    new_object.save()
+    #new_object = League(api_id=39, name="Premier League", json_data=data)
+    #new_object.save()
     print("Loading Premier League...")
 
 def load_team_json_into_class():
@@ -245,9 +247,14 @@ def index(request):
 
     #load_json_into_class()
     
+
+
     f = open( 'PremierLeague.json')
     data = json.load( f )
     pretty_schedule = json.dumps(data, indent=4)
+
+
+
     #response = requests.request("GET", url_soccer, headers=headers_soccer, params=querystring_soccer)
 
     #data = json.loads( response.text )
@@ -278,10 +285,13 @@ def index(request):
 
 
     #load_teamleague()
+    #load_league_json_into_class()
 
     print("##################### START INDEX #####################")
     context = {}
 
+
+    print("********************** LOADING PREMIER LEAGUE INTO CONTEXT ***********")
     # Load context with leagues
     leagues = League.objects.all()
 
@@ -293,12 +303,18 @@ def index(request):
         tmp_context = []
 
         for game in games_raw_data:
+
+            if(league.sport == "SOCCER"):
+                date = game['fixture']['date']
+            elif(league.sport == "FOOTBALL"):
+                date = game['game']['date']
+
             tmp_dict = {
                 'home_team': game['teams']['home']['name'],
                 'away_team': game['teams']['away']['name'],
-
-                'date': game['fixture']['date'],
+                'date': date 
             }
+            
 
             tmp_context.append(tmp_dict)
 
