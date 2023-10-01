@@ -34,6 +34,9 @@ class League(models.Model):
 
         time_chunks = {}
 
+        # Soccer Time Format:
+        #   2023-08-11T19:00:00+00:00
+
         # The int() is to convert the json into int so it
         #   can be compared to the current time dict
         time_chunks['Year'] = int(unformattedTime[0:4])
@@ -43,6 +46,26 @@ class League(models.Model):
         time_chunks['Minute'] = int(unformattedTime[14:16])
 
         return time_chunks
+
+
+    def format_time_football( self, unformattedTime):
+        time_chunks = {}
+
+        # Soccer Time Format:
+        #   2023-08-11T19:00:00+00:00
+
+        # The int() is to convert the json into int so it
+        #   can be compared to the current time dict
+        time_chunks['Year'] = int(unformattedTime['date'][0:4])
+        time_chunks['Month'] = int(unformattedTime['date'][5:7])
+        time_chunks['Day'] = int(unformattedTime['date'][8:10])
+        time_chunks['Hour'] = int(unformattedTime['time'][0:2])
+        time_chunks['Minute'] = int(unformattedTime['time'][3:5])
+
+        unformattedTime['date'][0:4]
+
+        return time_chunks
+
 
     # Send a game schedule to determine if the game is 
     #   in the future 
@@ -83,52 +106,35 @@ class League(models.Model):
         
 
         all_team_IDs = []
-        
+        all_next_games = []
+
         # Get all team IDs
         for j in self.json_data:
             if j['teams']['home']['id'] not in all_team_IDs:
                 all_team_IDs.append( j['teams']['home']['id'] )
             if j['teams']['away']['id'] not in all_team_IDs:
                 all_team_IDs.append( j['teams']['away']['id'] )
+
         
-        print( all_team_IDs )
-
-        all_next_games = []
-
+        # Get the next game for each team
         for team_ID in all_team_IDs:
             for game in self.json_data:
                 if( game['teams']['home']['id'] == team_ID or game['teams']['away']['id'] == team_ID ):
-                    print("###########################################################")
-                    #print(game['fixture']['date'])
-
-                    game_time_chunks = self.format_time_soccer( game['fixture']['date'] )
-
-                    #print( self.is_future_game( current_time_chunks, game_time_chunks ) )
-
-                    print("###########################################################")
+                    print("\n\n",self.sport)
+                    if( self.sport == "SOCCER"):
+                        game_time_chunks = self.format_time_soccer( game['fixture']['date'] )
+                    elif( self.sport == "FOOTBALL"):
+                        game_time_chunks = self.format_time_football( game['game']['date'] )
 
                     if( self.is_future_game( current_time_chunks, game_time_chunks ) ):
                         all_next_games.append( game )
                         
                         break
-            print("NEW TEAM ID")
 
 
-        print("\n\n\n")
-
-        unique_list = [item for index, item in enumerate(all_next_games) if item not in all_next_games[:index]]
-
-        for game in all_next_games:
-            print( game['teams']['home']['name'], 'V', game['teams']['away']['name'])
-
-        print("\n")
-
-        for u in unique_list:
-            print( u['teams']['home']['name'], 'V', u['teams']['away']['name'])
-
-        print("\n\n\n")
+        unique_game_list = [item for index, item in enumerate(all_next_games) if item not in all_next_games[:index]]
         
-        return unique_list
+        return unique_game_list
 
         
 
@@ -251,3 +257,6 @@ class TeamLeague(models.Model):
 
     class Meta:
         unique_together = ['team', 'league']
+
+    def __str__(self):
+        return self.team.name
