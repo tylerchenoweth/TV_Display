@@ -27,6 +27,7 @@ class League(models.Model):
     sport = models.CharField(max_length=15, choices=SPORT_TYPE, default=SOCCER, blank=True)
     json_data = models.JSONField(default=default_json)
 
+    #def adjust_timezone(self, datetime, time_offset):
 
 
     # Format the time for the game into a dictionary
@@ -110,14 +111,17 @@ class League(models.Model):
 
         # Get all team IDs
         for j in self.json_data:
-            if j['teams']['home']['id'] not in all_team_IDs:
-                all_team_IDs.append( j['teams']['home']['id'] )
-            if j['teams']['away']['id'] not in all_team_IDs:
-                all_team_IDs.append( j['teams']['away']['id'] )
+            if j['teams']['home']['id'] != 0 and j['teams']['away']['id'] != 0:
+                if j['teams']['home']['id'] not in all_team_IDs:
+                    all_team_IDs.append( j['teams']['home']['id'] )
+                if j['teams']['away']['id'] not in all_team_IDs:
+                    all_team_IDs.append( j['teams']['away']['id'] )
 
-        
+        print("ALL NEXT GAMES \n\n")
+        print(all_team_IDs)
         # Get the next game for each team
         for team_ID in all_team_IDs:
+            print("TEAM ID: ", team_ID)
             for game in self.json_data:
                 if( game['teams']['home']['id'] == team_ID or game['teams']['away']['id'] == team_ID ):
                     print("\n\n",self.sport)
@@ -128,6 +132,10 @@ class League(models.Model):
 
                     if( self.is_future_game( current_time_chunks, game_time_chunks ) ):
                         all_next_games.append( game )
+
+                        print("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+                        print(game)
+                        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$\n")
                         
                         break
 
