@@ -27,8 +27,38 @@ class League(models.Model):
     sport = models.CharField(max_length=15, choices=SPORT_TYPE, default=SOCCER, blank=True)
     json_data = models.JSONField(default=default_json)
 
-    #def adjust_timezone(self, datetime, time_offset):
+    def adjust_timezone(self, time_chunks, time_offset):
+        days_in_month = {
+            1 : 31,
+            2 : 28,
+            3 : 31,
+            4 : 30,
+            5 : 31,
+            6 : 30,
+            7 : 31,
+            8 : 31,
+            9 : 30,
+            10 : 31,
+            11 : 30,
+            12 : 31
+        }
 
+        time_chunks['Hour'] -= time_offset
+
+        if time_chunks['Hour'] < 0:
+            time_chunks['Hour'] %= 24
+            time_chunks['Day'] -= 1
+
+            if time_chunks['Day'] <= 0:
+                time_chunks['Month'] -= 1
+
+                if time_chunks['Month'] <= 0:
+                    time_chunks['Month'] = 12
+                    time_chunks['Year'] -= 1
+
+                time_chunks['Day'] = days_in_month[ time_chunks['Day'] ]
+
+        return time_chunks
 
     # Format the time for the game into a dictionary
     def format_time_soccer( self, unformattedTime ):
@@ -45,6 +75,8 @@ class League(models.Model):
         time_chunks['Day'] = int(unformattedTime[8:10])
         time_chunks['Hour'] = int(unformattedTime[11:13])
         time_chunks['Minute'] = int(unformattedTime[14:16])
+
+        time_chunks = self.adjust_timezone( time_chunks, 4)
 
         return time_chunks
 
@@ -63,7 +95,7 @@ class League(models.Model):
         time_chunks['Hour'] = int(unformattedTime['time'][0:2])
         time_chunks['Minute'] = int(unformattedTime['time'][3:5])
 
-        unformattedTime['date'][0:4]
+        time_chunks = self.adjust_timezone( time_chunks, 4)
 
         return time_chunks
 
@@ -129,12 +161,14 @@ class League(models.Model):
                         game_time_chunks = self.format_time_soccer( game['fixture']['date'] )
                     elif( self.sport == "FOOTBALL"):
                         game_time_chunks = self.format_time_football( game['game']['date'] )
+                        
 
                     if( self.is_future_game( current_time_chunks, game_time_chunks ) ):
                         all_next_games.append( game )
 
                         print("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$")
                         print(game)
+                        print( game_time_chunks )
                         print("$$$$$$$$$$$$$$$$$$$$$$$$$$$\n")
                         
                         break
@@ -142,6 +176,8 @@ class League(models.Model):
 
         unique_game_list = [item for index, item in enumerate(all_next_games) if item not in all_next_games[:index]]
         
+        print( unique_game_list )
+
         return unique_game_list
 
         
