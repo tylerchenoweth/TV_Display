@@ -178,39 +178,26 @@ class League(models.Model):
         print(all_team_IDs)
         # Get the next game for each team
         for team_ID in all_team_IDs:
-            print("TEAM ID: ", team_ID)
             for game in self.json_data:
                 if( game['teams']['home']['id'] == team_ID or game['teams']['away']['id'] == team_ID ):
-                    print("\n\n",self.sport)
+                    
                     if( self.sport == "SOCCER"):
                         game_time_chunks = self.format_time_soccer( game['fixture']['date'] )
                     elif( self.sport == "FOOTBALL"):
                         game_time_chunks = self.format_time_football( game['game']['date'] )
                         
-
                     if( self.is_future_game( current_time_chunks, game_time_chunks ) ):
                         all_next_games.append( game )
-
-                        print("\n$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-                        print(game)
-                        print( game_time_chunks )
-                        print("$$$$$$$$$$$$$$$$$$$$$$$$$$$\n")
                         
                         break
 
 
         unique_game_list = [item for index, item in enumerate(all_next_games) if item not in all_next_games[:index]]
-        
-        print("UNIQUEY GAME LIST")
-        for u in unique_game_list:
-            print(u)
 
         return unique_game_list
 
     # Format the raw json for each individual game into a dict
     def format_game(self, raw_json):
-        #'home_team': game['teams']['home']['name']
-        #'away_team': game['teams']['away']['name']
 
         date_time = {}
 
@@ -245,9 +232,8 @@ class League(models.Model):
 
         for s in formatted_games_list:
             print( s )
-        print("ASSIGNING VALUE")
+
         self.game_details = formatted_games_list
-        print( self.game_details )
 
     def get_dict_key_name(self):
         return self.name.replace(' ','_')
