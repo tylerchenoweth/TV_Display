@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.postgres.fields import ArrayField
 # Create your models here.
 # Create your models here.
 class League(models.Model):
@@ -22,10 +22,31 @@ class League(models.Model):
     def default_json():
         return {}
 
+    def default_game_details():
+        details = [
+            {
+                "teams" : {
+                    "home" : None,
+                    "away" : None,
+                },
+                "datetime" : {
+                    "year" : None,
+                    "month" : None,
+                    "day" : None,
+                    "hour" : None,
+                    "minute" : None
+                }
+            }
+        ]
+
+        return details
+
     api_id = models.IntegerField(blank=False, default=0)
     name = models.CharField(max_length=50, default="Leagaaa")
     sport = models.CharField(max_length=15, choices=SPORT_TYPE, default=SOCCER, blank=True)
     json_data = models.JSONField(default=default_json)
+    game_details = models.JSONField( default=default_json )
+
 
     def adjust_timezone(self, time_chunks, time_offset):
         days_in_month = {
@@ -123,8 +144,12 @@ class League(models.Model):
         return False
 
 
+    
+
+
+
     def get_next_game(self):
-        print("Finding next game...")
+        print("Finding next games...")
 
         # Get the current date and time
         current_time = datetime.now()
@@ -176,11 +201,53 @@ class League(models.Model):
 
         unique_game_list = [item for index, item in enumerate(all_next_games) if item not in all_next_games[:index]]
         
-        print( unique_game_list )
+        print("UNIQUEY GAME LIST")
+        for u in unique_game_list:
+            print(u)
 
         return unique_game_list
 
+    # Format the raw json for each individual game into a dict
+    def format_game(self, raw_json):
+        #'home_team': game['teams']['home']['name']
+        #'away_team': game['teams']['away']['name']
+
+        date_time = {}
+
+        if( self.sport == "SOCCER"):
+            date_time = self.format_time_soccer( raw_json['fixture']['date'] )
+        elif( self.sport == "FOOTBALL"):
+            date_time = self.format_time_football( raw_json['game']['date'] )
+
+        formatted_json = {
+            "Teams" : {
+                "Home" : raw_json['teams']['home']['name'],
+                "Away" : raw_json['teams']['away']['name'],
+            },
+
+            "Date_Time" : date_time
+        }
+
+        return formatted_json
+
+
+    def set_next_games(self):
+        next_game_raw_json_list = self.get_next_game()
+        formatted_games_list = []
+
         
+
+        for something in next_game_raw_json_list:
+            formatted_games_list.append(
+                self.format_game( something )
+
+            )
+
+        for s in formatted_games_list:
+            print( s )
+        print("ASSIGNING VALUE")
+        self.game_details = formatted_games_list
+        print( self.game_details )
 
     def get_dict_key_name(self):
         return self.name.replace(' ','_')
