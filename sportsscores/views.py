@@ -122,6 +122,8 @@ def load_teamleague():
     new_object.save()
 
 
+
+
 # Create your views here.
 def index(request):
 
@@ -294,11 +296,12 @@ def index(request):
     print("********************** LOADING PREMIER LEAGUE INTO CONTEXT ***********")
     # Load context with leagues
     leagues = League.objects.all()
-
+    """
     for league in leagues:
         #print(league.name,"\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
         context[league.get_dict_key_name()] = league.json_data
-        games_raw_data = league.get_next_game()
+        league.set_next_games()
+        games_raw_data = league.game_details()
 
         tmp_context = []
 
@@ -320,7 +323,20 @@ def index(request):
 
         context[league.get_dict_key_name()] = tmp_context
 
+    """
 
+    for league in leagues:
+        print(league.name,"\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+        league.set_next_games()
+        context[league.get_dict_key_name()] = league.game_details
+        print("\n\n\n\n\n\n\n\n\nPROOF")
+        print( league.game_details[0]['Teams'])
+        print( league.game_details)
+        print("\n\n\n\n\n\n\n\n")
+        
+
+
+        
 
 
 
