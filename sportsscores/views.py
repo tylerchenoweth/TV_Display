@@ -296,54 +296,13 @@ def index(request):
     print("********************** LOADING PREMIER LEAGUE INTO CONTEXT ***********")
     # Load context with leagues
     leagues = League.objects.all()
-    """
-    for league in leagues:
-        #print(league.name,"\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
-        context[league.get_dict_key_name()] = league.json_data
-        league.set_next_games()
-        games_raw_data = league.game_details()
-
-        tmp_context = []
-
-        for game in games_raw_data:
-
-            if(league.sport == "SOCCER"):
-                date = game['fixture']['date']
-            elif(league.sport == "FOOTBALL"):
-                date = game['game']['date']
-
-            tmp_dict = {
-                'home_team': game['teams']['home']['name'],
-                'away_team': game['teams']['away']['name'],
-                'date': date 
-            }
-            
-
-            tmp_context.append(tmp_dict)
-
-        context[league.get_dict_key_name()] = tmp_context
-
-    """
 
     for league in leagues:
-        print(league.name,"\n\n\n\n\n\n\n\n\n\n\n\n\n\n")
+
         league.set_next_games()
         context[league.get_dict_key_name()] = league.game_details
-        print("\n\n\n\n\n\n\n\n\nPROOF")
-        print( league.game_details[0]['Teams'])
-        print( league.game_details)
-        print("\n\n\n\n\n\n\n\n")
         
-
-
         
-
-
-
-
-
-
-
 
 
     teamleague = TeamLeague.objects.all()
