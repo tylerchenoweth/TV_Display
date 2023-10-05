@@ -1,7 +1,7 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
 # Create your models here.
-# Create your models here.
+
 class League(models.Model):
 
     SOCCER = "SOCCER"
@@ -25,6 +25,7 @@ class League(models.Model):
     def default_game_details():
         details = [
             {
+                "Display_Name" : None,
                 "teams" : {
                     "home" : None,
                     "away" : None,
@@ -40,6 +41,7 @@ class League(models.Model):
         ]
 
         return details
+
 
     api_id = models.IntegerField(blank=False, default=0)
     name = models.CharField(max_length=50, default="Leagaaa")
@@ -176,6 +178,7 @@ class League(models.Model):
 
         print("ALL NEXT GAMES \n\n")
         print(all_team_IDs)
+
         # Get the next game for each team
         for team_ID in all_team_IDs:
             for game in self.json_data:
@@ -207,6 +210,7 @@ class League(models.Model):
             date_time = self.format_time_football( raw_json['game']['date'] )
 
         formatted_json = {
+            "Display_Name" : self.name,
             "Teams" : {
                 "Home" : raw_json['teams']['home']['name'],
                 "Away" : raw_json['teams']['away']['name'],
