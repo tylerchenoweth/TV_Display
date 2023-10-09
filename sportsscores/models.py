@@ -150,7 +150,7 @@ class League(models.Model):
 
 
 
-    def get_next_game(self):
+    def get_next_game_raw_json(self):
         print("Finding next games...")
 
         # Get the current date and time
@@ -194,50 +194,68 @@ class League(models.Model):
                         
                         break
 
-
+        # Filter the duplicate games out of the list
         unique_game_list = [item for index, item in enumerate(all_next_games) if item not in all_next_games[:index]]
 
+        # Return next games in raw json form
         return unique_game_list
 
-    # Format the raw json for each individual game into a dict
-    def format_game(self, raw_json):
-
-        date_time = {}
-
-        if( self.sport == "SOCCER"):
-            date_time = self.format_time_soccer( raw_json['fixture']['date'] )
-        elif( self.sport == "FOOTBALL"):
-            date_time = self.format_time_football( raw_json['game']['date'] )
-
-        formatted_json = {
-            "Display_Name" : self.name,
-            "Teams" : {
-                "Home" : raw_json['teams']['home']['name'],
-                "Away" : raw_json['teams']['away']['name'],
-            },
-
-            "Date_Time" : date_time
-        }
-
-        return formatted_json
-
-
+    
     def set_next_games(self):
-        next_game_raw_json_list = self.get_next_game()
+
+        # Format the raw json for each individual game into a dict
+        def format_game( raw_json):
+
+            date_time = {}
+
+            if( self.sport == "SOCCER"):
+                date_time = self.format_time_soccer( raw_json['fixture']['date'] )
+            elif( self.sport == "FOOTBALL"):
+                date_time = self.format_time_football( raw_json['game']['date'] )
+
+            formatted_json = {
+                "Display_Name" : self.name,
+                "Teams" : {
+                    "Home" : raw_json['teams']['home']['name'],
+                    "Away" : raw_json['teams']['away']['name'],
+                },
+
+                "Date_Time" : date_time
+            }
+
+            return formatted_json
+
+
+
+
+
+
+        next_game_raw_json_list = self.get_next_game_raw_json()
         formatted_games_list = []
 
         
 
         for something in next_game_raw_json_list:
             formatted_games_list.append(
-                self.format_game( something )
-
+                format_game( something )
             )
 
         for s in formatted_games_list:
             print( s )
 
-        self.game_details = formatted_games_list
+        return formatted_games_list
+
+    ################################
+    
+
+
+
+
+
+
+
+
+
 
     def get_dict_key_name(self):
         return self.name.replace(' ','_')
@@ -346,6 +364,12 @@ class TeamLeague(models.Model):
                 return game
 
         
+
+
+
+
+
+
 
 
 
