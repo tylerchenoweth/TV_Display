@@ -299,7 +299,7 @@ def index(request):
 
     for league in leagues:
 
-        games = league.set_next_games()
+        games = league.get_next_games_display()
         context[league.get_dict_key_name()] = games
         
         
