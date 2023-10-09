@@ -150,7 +150,7 @@ class League(models.Model):
 
 
 
-    def get_next_game_raw_json(self):
+    def get_next_games_raw_json(self):
         print("Finding next games...")
 
         # Get the current date and time
@@ -201,7 +201,7 @@ class League(models.Model):
         return unique_game_list
 
     
-    def set_next_games(self):
+    def get_next_games_display(self):
 
         # Format the raw json for each individual game into a dict
         def format_game( raw_json):
@@ -229,23 +229,21 @@ class League(models.Model):
 
 
 
-
-        next_game_raw_json_list = self.get_next_game_raw_json()
+        # Get the raw JSON of all the next games (game list is unique)
+        next_game_raw_json_list = self.get_next_games_raw_json()
         formatted_games_list = []
 
         
-
+        # Format the games into a dictionary to be displayed on the template
         for something in next_game_raw_json_list:
             formatted_games_list.append(
                 format_game( something )
             )
 
-        for s in formatted_games_list:
-            print( s )
 
         return formatted_games_list
 
-    ################################
+
     
 
 
@@ -335,7 +333,6 @@ class TeamLeague(models.Model):
 
 
     def get_next_game(self):
-        #print("Finding next game...")
 
         # Get the current date and time
         current_time = datetime.now()
