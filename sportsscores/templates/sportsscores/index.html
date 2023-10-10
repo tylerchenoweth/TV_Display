@@ -11,7 +11,72 @@
 <p>Current Time: {% now "SHORT_DATETIME_FORMAT" %} --- {% now "jS F Y H:i" %}</p>
 
 
-<p> {{ Chelsea }} </p>
+<!--<p> {{ Chelsea }} </p>-->
+
+
+
+
+
+
+
+
+<table>
+    <tr>
+        <th>Premier League</th>
+        <th>NFL</th>
+    </tr>
+    {% for d1, d2 in deuce %}
+    <tr>
+        <div class="row justify-content-center">
+            {% if d1.Teams.Home != None or d1.Teams.Away != None %}
+            <p class="col-md-2 text-end"> {{ d1.Teams.Home }} </p>
+            <p class="col-md-1 text-center"> V </p>
+            <p class="col-md-2 text-left"> {{ d1.Teams.Away }} </p>
+            {% endif %}
+            <p class="col-md-2 text-end"> {{ d2.Teams.Home }} </p>
+            <p class="col-md-1 text-center"> V </p>
+            <p class="col-md-2 text-left"> {{ d2.Teams.Away }} </p>
+        </div>
+        <div class="row justify-content-center">
+            <p class="col-md-5 text-center">
+                {{ d1.Date_Time.Month }} -
+                {{ d1.Date_Time.Day }} -
+                {{ d1.Date_Time.Year }} @
+                {{ d1.Date_Time.Hour }} :
+                <!-- 
+                    The minute is an integer so it will not return 
+                    two 0's 
+                -->
+                {% if d1.Date_Time.Minute == 0 %}
+                {{ d1.Date_Time.Minute }}0
+                {% else %}
+                    {{ d1.Date_Time.Minute }}
+                {% endif %}    
+            </p>
+
+            <p class="col-md-5 text-center">
+                {{ d2.Date_Time.Month }} -
+                {{ d2.Date_Time.Day }} -
+                {{ d2.Date_Time.Year }} @
+                {{ d2.Date_Time.Hour }} :
+                <!-- 
+                    The minute is an integer so it will not return 
+                    two 0's 
+                -->
+                {% if d2.Date_Time.Minute == 0 %}
+                {{ d2.Date_Time.Minute }}0
+                {% else %}
+                    {{ d2.Date_Time.Minute }}
+                {% endif %}    
+            </p>
+        </div>
+        
+    </tr>
+    {% endfor %}
+</table>
+
+
+
 
 
 
@@ -20,27 +85,28 @@
 <table>
     <div class="row justify-content-center">
         <h1 class="col-md-4 text-center"> {{ Premier_League.0.Display_Name }} </h1>
+        <h1 class="col-md-4 text-center"> {{ NFL.0.Display_Name }} </h1>
     </div>
-    {% for game in Premier_League %}
+    {% for d1, d2 in deuce %}
         <div class="row justify-content-center">
-            <p class="col-md-2 text-end"> {{ game.Teams.Home }} </p>
+            <p class="col-md-2 text-end"> {{ d1.Teams.Home }} </p>
             <p class="col-md-1 text-center"> V </p>
-            <p class="col-md-2 text-left"> {{ game.Teams.Away }} </p>
+            <p class="col-md-2 text-left"> {{ PL_Game.Teams.Away }} </p>
         </div>  
         <div class="row justify-content-center">
             <p class="col-md-5 text-center">
-                {{ game.Date_Time.Month }} -
-                {{ game.Date_Time.Day }} -
-                {{ game.Date_Time.Year }} @
-                {{ game.Date_Time.Hour }} :
+                {{ PL_Game.Date_Time.Month }} -
+                {{ PL_Game.Date_Time.Day }} -
+                {{ PL_Game.Date_Time.Year }} @
+                {{ PL_Game.Date_Time.Hour }} :
                 <!-- 
                     The minute is an integer so it will not return 
                     two 0's 
                 -->
-                {% if game.Date_Time.Minute == 0 %}
-                {{ game.Date_Time.Minute }}0
+                {% if PL_Game.Date_Time.Minute == 0 %}
+                {{ PL_Game.Date_Time.Minute }}0
                 {% else %}
-                    {{ game.Date_Time.Minute }}
+                    {{ PL_Game.Date_Time.Minute }}
                 {% endif %}    
             </p>
         </div>
