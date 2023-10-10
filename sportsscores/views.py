@@ -124,6 +124,9 @@ def load_teamleague():
 
 
 
+from itertools import zip_longest
+
+
 # Create your views here.
 def index(request):
 
@@ -294,15 +297,26 @@ def index(request):
 
 
     print("********************** LOADING PREMIER LEAGUE INTO CONTEXT ***********")
+
     # Load context with leagues
     leagues = League.objects.all()
+
+    stage_context = {}
 
     for league in leagues:
 
         games = league.get_next_games_display()
-        context[league.get_dict_key_name()] = games
+        stage_context[league.get_dict_key_name()] = games
         
-        
+    #for item1, item2 in zip_longest( stage_context[0], stage_context[1] )
+
+    deuce = zip_longest( stage_context['Premier_League'], stage_context['NFL'], fillvalue=None )
+
+    print("\n\n\n\n\n\n\n")
+    print(deuce)
+    print("\n\n\n\n\n\n\n")
+
+    context['deuce'] = deuce
 
 
     teamleague = TeamLeague.objects.all()
