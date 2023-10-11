@@ -28,46 +28,66 @@
     {% for d1, d2 in deuce %}
     <tr>
         <div class="row justify-content-center">
-            {% if d1.Teams.Home != None or d1.Teams.Away != None %}
-            <p class="col-md-2 text-end"> {{ d1.Teams.Home }} </p>
-            <p class="col-md-1 text-center"> V </p>
-            <p class="col-md-2 text-left"> {{ d1.Teams.Away }} </p>
+            {% if d1.Teams != None %}
+                <p class="col-md-2 text-end"> {{ d1.Teams.Home }} </p>
+                <p class="col-md-1 text-center"> V </p>
+                <p class="col-md-2 text-left"> {{ d1.Teams.Away }} </p>
+            {% else %}
+                <p class="col-md-2 text-end"></p>
+                <p class="col-md-1 text-center"></p>
+                <p class="col-md-2 text-left"></p>
             {% endif %}
-            <p class="col-md-2 text-end"> {{ d2.Teams.Home }} </p>
-            <p class="col-md-1 text-center"> V </p>
-            <p class="col-md-2 text-left"> {{ d2.Teams.Away }} </p>
+
+            {% if d2.Teams.Home != None or d2.Teams.Away != None %}
+                <p class="col-md-2 text-end"> {{ d2.Teams.Home }} </p>
+                <p class="col-md-1 text-center"> V </p>
+                <p class="col-md-2 text-left"> {{ d2.Teams.Away }} </p>
+            {% else %}
+                <p class="col-md-2 text-end"></p>
+                <p class="col-md-1 text-center"></p>
+                <p class="col-md-2 text-left"></p>
+            {% endif %}
+
+
         </div>
         <div class="row justify-content-center">
             <p class="col-md-5 text-center">
-                {{ d1.Date_Time.Month }} -
-                {{ d1.Date_Time.Day }} -
-                {{ d1.Date_Time.Year }} @
-                {{ d1.Date_Time.Hour }} :
-                <!-- 
-                    The minute is an integer so it will not return 
-                    two 0's 
-                -->
-                {% if d1.Date_Time.Minute == 0 %}
-                {{ d1.Date_Time.Minute }}0
-                {% else %}
-                    {{ d1.Date_Time.Minute }}
-                {% endif %}    
+
+                {% if d1.Date_Time != None %}
+                    {{ d1.Date_Time.Month }} -
+                    {{ d1.Date_Time.Day }} -
+                    {{ d1.Date_Time.Year }} @
+                    {{ d1.Date_Time.Hour }} :
+                
+                    <!-- 
+                        The minute is an integer so it will not return 
+                        two 0's 
+                    -->
+                    {% if d1.Date_Time.Minute == 0 %}
+                    {{ d1.Date_Time.Minute }}0
+                    {% else %}
+                        {{ d1.Date_Time.Minute }}
+                    {% endif %} 
+                {% endif %}   
             </p>
 
             <p class="col-md-5 text-center">
-                {{ d2.Date_Time.Month }} -
-                {{ d2.Date_Time.Day }} -
-                {{ d2.Date_Time.Year }} @
-                {{ d2.Date_Time.Hour }} :
-                <!-- 
-                    The minute is an integer so it will not return 
-                    two 0's 
-                -->
-                {% if d2.Date_Time.Minute == 0 %}
-                {{ d2.Date_Time.Minute }}0
-                {% else %}
-                    {{ d2.Date_Time.Minute }}
-                {% endif %}    
+                {% if d2.Date_Time != None %}
+                    {{ d2.Date_Time.Month }} -
+                    {{ d2.Date_Time.Day }} -
+                    {{ d2.Date_Time.Year }} @
+                    {{ d2.Date_Time.Hour }} :
+                
+                    <!-- 
+                        The minute is an integer so it will not return 
+                        two 0's 
+                    -->
+                    {% if d2.Date_Time.Minute == 0 %}
+                    {{ d2.Date_Time.Minute }}0
+                    {% else %}
+                        {{ d2.Date_Time.Minute }}
+                    {% endif %} 
+                {% endif %}   
             </p>
         </div>
         
