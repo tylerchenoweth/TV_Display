@@ -20,12 +20,13 @@
 
 
 
-<table>
-    <tr>
-        <th>Premier League</th>
-        <th>NFL</th>
-    </tr>
+<table>   
+
+
     {% for d1, d2 in deuce %}
+
+
+
     <tr>
         <div class="row justify-content-center">
             {% if d1.Teams != None %}
@@ -54,6 +55,7 @@
             <p class="col-md-5 text-center">
 
                 {% if d1.Date_Time != None %}
+                    {{ d1.Date_Time.Day_of_Week }}
                     {{ d1.Date_Time.Month }} -
                     {{ d1.Date_Time.Day }} -
                     {{ d1.Date_Time.Year }} @
@@ -73,6 +75,7 @@
 
             <p class="col-md-5 text-center">
                 {% if d2.Date_Time != None %}
+                    {{ d2.Date_Time.Day_of_Week }}
                     {{ d2.Date_Time.Month }} -
                     {{ d2.Date_Time.Day }} -
                     {{ d2.Date_Time.Year }} @
