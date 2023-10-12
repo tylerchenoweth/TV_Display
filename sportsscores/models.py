@@ -1,5 +1,8 @@
 from django.db import models
 from django.contrib.postgres.fields import ArrayField
+
+
+
 # Create your models here.
 
 class League(models.Model):
@@ -12,12 +15,6 @@ class League(models.Model):
         (FOOTBALL, "Football"),
     ]
 
-    """
-    api_id = models.IntegerField(blank=False, validators=[MinValueValidator(0)]),
-    name = models.CharField(blank=True, max_length=50),
-    sport = models.CharField(max_length=15, choices=SPORT_TYPE),
-    json_data = models.JSONField()
-    """
 
     def default_json():
         return {}
@@ -83,10 +80,23 @@ class League(models.Model):
 
         return time_chunks
 
+    def get_day_of_week(self, given_date):
+        import datetime
+        import calendar
+
     # Format the time for the game into a dictionary
     def format_time_soccer( self, unformattedTime ):
 
+        import datetime
+        import calendar
+
         time_chunks = {}
+
+        given_date = datetime.date(
+            int(unformattedTime[0:4]),
+            int(unformattedTime[5:7]),
+            int(unformattedTime[8:10])
+        )
 
         # Soccer Time Format:
         #   2023-08-11T19:00:00+00:00
@@ -98,6 +108,7 @@ class League(models.Model):
         time_chunks['Day'] = int(unformattedTime[8:10])
         time_chunks['Hour'] = int(unformattedTime[11:13])
         time_chunks['Minute'] = int(unformattedTime[14:16])
+        time_chunks['Day_of_Week'] = given_date.strftime("%A")
 
         time_chunks = self.adjust_timezone( time_chunks, 4)
 
@@ -105,7 +116,17 @@ class League(models.Model):
 
 
     def format_time_football( self, unformattedTime):
+
+        import datetime
+        import calendar
+        
         time_chunks = {}
+
+        given_date = datetime.date(
+            int(unformattedTime['date'][0:4]),
+            int(unformattedTime['date'][5:7]),
+            int(unformattedTime['date'][8:10])
+        )
 
         # Soccer Time Format:
         #   2023-08-11T19:00:00+00:00
@@ -117,6 +138,7 @@ class League(models.Model):
         time_chunks['Day'] = int(unformattedTime['date'][8:10])
         time_chunks['Hour'] = int(unformattedTime['time'][0:2])
         time_chunks['Minute'] = int(unformattedTime['time'][3:5])
+        time_chunks['Day_of_Week'] = given_date.strftime("%A")
 
         time_chunks = self.adjust_timezone( time_chunks, 4)
 
