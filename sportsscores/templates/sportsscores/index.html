@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% load static %}
-
+{% load custom_filters %}
 
 {% block title %} Sports Scores {% endblock %}
 
@@ -16,85 +16,92 @@
 
 
 
+{% for group in Premier_League|group_in_threes %}
+  <div class="group">
+    <div class="row">
+
+    {% for d1 in group %}
+    <div class="card col-md-2" style="margin:2px;">
+        <ul class="list-group list-group-flush">
+        
+            <li class="list-group-item"> {{d1.Teams.Home}}</li>
+            <li class="list-group-item"> {{d1.Teams.Away}} </li>
+            <li class="list-group-item"> 
+                {{d1.Date_Time.Day_of_Week}},
+                {{d1.Date_Time.Month}} -
+                {{d1.Date_Time.Day}} -
+                {{d1.Date_Time.Year}}
+                {{d1.Date_Time.Hour}} :
+                {{d1.Date_Time.Minute}}
+            </li>
+        
+        </ul>
+    </div>
+    {% endfor %}
+
+    </div>
+  </div>
+{% endfor %}
+
+<br><br><br>
+
+{% for d1, d2 in deuce %}
+<div class="card col-md-2">
+    <ul class="list-group list-group-flush">
+    
+    <li class="list-group-item"> {{d1.Teams.Home}}</li>
+    <li class="list-group-item"> {{d1.Teams.Away}} </li>
+    
+    
+    </ul>
+</div>
+<br>
+{% endfor %}
 
 
 
 
-<table>   
 
+<table class="table table-striped" style="table-layout: fixed;">   
+
+    <thead>
+        <tr>
+            <th scope="col">One</th>
+            <th scope="col">Two</th>
+        </tr>
+    </thead>
 
     {% for d1, d2 in deuce %}
 
-
-
     <tr>
-        <div class="row justify-content-center">
-            {% if d1.Teams != None %}
-                <p class="col-md-2 text-end"> {{ d1.Teams.Home }} </p>
-                <p class="col-md-1 text-center"> V </p>
-                <p class="col-md-2 text-left"> {{ d1.Teams.Away }} </p>
-            {% else %}
-                <p class="col-md-2 text-end"></p>
-                <p class="col-md-1 text-center"></p>
-                <p class="col-md-2 text-left"></p>
-            {% endif %}
+        <td class="col-md-2 text-end">{{d1.Teams.Home}}</td>
+        <td class="col-md-1 text-center"> v </td>
+        <td class="col-md-2 ">{{d1.Teams.Away}}</td>
 
-            {% if d2.Teams.Home != None or d2.Teams.Away != None %}
-                <p class="col-md-2 text-end"> {{ d2.Teams.Home }} </p>
-                <p class="col-md-1 text-center"> V </p>
-                <p class="col-md-2 text-left"> {{ d2.Teams.Away }} </p>
-            {% else %}
-                <p class="col-md-2 text-end"></p>
-                <p class="col-md-1 text-center"></p>
-                <p class="col-md-2 text-left"></p>
-            {% endif %}
+        <td class="col-md-2 text-end">{{d2.Teams.Home}}</td>
+        <td class="col-md-1 text-center"> v </td>
+        <td class="col-md-2">{{d2.Teams.Away}}</td>
+    </tr>
+    <tr style="border:1px solid black;">
+        <td class="col-md-5">{{d1.Date_Time.Day_of_Week}}
+        {{d1.Date_Time.Month}}
+        {{d1.Date_Time.Day}}
+        {{d1.Date_Time.Year}}
+        {{d1.Date_Time.Hour}}
+        {{d1.Date_Time.Minute}}</td>
+        
+        
 
-
-        </div>
-        <div class="row justify-content-center">
-            <p class="col-md-5 text-center">
-
-                {% if d1.Date_Time != None %}
-                    {{ d1.Date_Time.Day_of_Week }}
-                    {{ d1.Date_Time.Month }} -
-                    {{ d1.Date_Time.Day }} -
-                    {{ d1.Date_Time.Year }} @
-                    {{ d1.Date_Time.Hour }} :
-                
-                    <!-- 
-                        The minute is an integer so it will not return 
-                        two 0's 
-                    -->
-                    {% if d1.Date_Time.Minute == 0 %}
-                    {{ d1.Date_Time.Minute }}0
-                    {% else %}
-                        {{ d1.Date_Time.Minute }}
-                    {% endif %} 
-                {% endif %}   
-            </p>
-
-            <p class="col-md-5 text-center">
-                {% if d2.Date_Time != None %}
-                    {{ d2.Date_Time.Day_of_Week }}
-                    {{ d2.Date_Time.Month }} -
-                    {{ d2.Date_Time.Day }} -
-                    {{ d2.Date_Time.Year }} @
-                    {{ d2.Date_Time.Hour }} :
-                
-                    <!-- 
-                        The minute is an integer so it will not return 
-                        two 0's 
-                    -->
-                    {% if d2.Date_Time.Minute == 0 %}
-                    {{ d2.Date_Time.Minute }}0
-                    {% else %}
-                        {{ d2.Date_Time.Minute }}
-                    {% endif %} 
-                {% endif %}   
-            </p>
-        </div>
+        <td class="offset-md-2 col-md-5">{{d2.Date_Time.Day_of_Week}}
+        {{d2.Date_Time.Month}}
+        {{d2.Date_Time.Day}}
+        {{d2.Date_Time.Year}}
+        {{d2.Date_Time.Hour}}
+        {{d2.Date_Time.Minute}}</td>
         
     </tr>
+
+    
     {% endfor %}
 </table>
 
@@ -105,71 +112,7 @@
 
 
 
-<table>
-    <div class="row justify-content-center">
-        <h1 class="col-md-4 text-center"> {{ Premier_League.0.Display_Name }} </h1>
-        <h1 class="col-md-4 text-center"> {{ NFL.0.Display_Name }} </h1>
-    </div>
-    {% for d1, d2 in deuce %}
-        <div class="row justify-content-center">
-            <p class="col-md-2 text-end"> {{ d1.Teams.Home }} </p>
-            <p class="col-md-1 text-center"> V </p>
-            <p class="col-md-2 text-left"> {{ PL_Game.Teams.Away }} </p>
-        </div>  
-        <div class="row justify-content-center">
-            <p class="col-md-5 text-center">
-                {{ PL_Game.Date_Time.Month }} -
-                {{ PL_Game.Date_Time.Day }} -
-                {{ PL_Game.Date_Time.Year }} @
-                {{ PL_Game.Date_Time.Hour }} :
-                <!-- 
-                    The minute is an integer so it will not return 
-                    two 0's 
-                -->
-                {% if PL_Game.Date_Time.Minute == 0 %}
-                {{ PL_Game.Date_Time.Minute }}0
-                {% else %}
-                    {{ PL_Game.Date_Time.Minute }}
-                {% endif %}    
-            </p>
-        </div>
-    {% endfor %} 
-    <br>
-    <hr>
-    <br>
 
-    <div class="row justify-content-center">
-        <h1 class="col-md-4 text-center"> {{ NFL.0.Display_Name }} </h1>
-    </div>
-    {% for game in NFL %}
-
-        <div class="row justify-content-center">
-            <p class="col-md-2 text-end"> {{ game.Teams.Home }} </p>
-            <p class="col-md-1 text-center"> V </p>
-            <p class="col-md-2 text-left"> {{ game.Teams.Away }} </p>
-        </div>  
-        <div class="row justify-content-center">
-            <p class="col-md-5 text-center"> 
-                {{ game.Date_Time.Month }} -
-                {{ game.Date_Time.Day }} -
-                {{ game.Date_Time.Year }} @
-                {{ game.Date_Time.Hour }} :
-                
-                <!-- 
-                    The minute is an integer so it will not return 
-                    two 0's 
-                -->
-                {% if game.Date_Time.Minute == 0 %}
-                {{ game.Date_Time.Minute }}0
-                {% else %}
-                    {{ game.Date_Time.Minute }}
-                {% endif %}
-            </p>
-        </div>
-        
-
-        <br>
-    {% endfor %}
 
 
 <!-- For Chelsea's Schedule -->
