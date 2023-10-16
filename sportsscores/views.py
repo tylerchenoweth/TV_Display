@@ -6,7 +6,10 @@ import requests
 import json
 
 from django.utils import timezone
-from datetime import datetime
+
+import datetime
+import calendar
+
 import pytz
 
 from .models import League, Team, TeamLeague
@@ -303,20 +306,46 @@ def index(request):
 
     stage_context = {}
 
+
+
+
+
     for league in leagues:
 
         games = league.get_next_games_display()
         stage_context[league.get_dict_key_name()] = games
-        
-    #for item1, item2 in zip_longest( stage_context[0], stage_context[1] )
 
+        print( games[0]['Date_Time'] )
+
+        
+        given_date = datetime.date(    
+            games[0]['Date_Time']['Year'],
+            games[0]['Date_Time']['Month'],
+            games[0]['Date_Time']['Day']
+        )
+
+        print("\n\n\n\n\n\n\n",type(games[0]['Date_Time']['Year']),"\n\n\n\n\n\n\n\n\n")
+
+        day_of_week = given_date.weekday()
+        day_name = given_date.strftime("%A")
+        
+        #print()
+        
+
+        #day = datetime.datetime.strptime(date, )
+
+
+        
+    
+    # This is hard coded but it needs to be changed once more leagues are added in
     deuce = zip_longest( stage_context['Premier_League'], stage_context['NFL'], fillvalue=None )
 
-    print("\n\n\n\n\n\n\n")
+    """print("\n\n\n\n\n\n\n")
     print(deuce)
-    print("\n\n\n\n\n\n\n")
+    print("\n\n\n\n\n\n\n")"""
 
     context['deuce'] = deuce
+    context['Premier_League'] = stage_context['Premier_League']
 
 
     teamleague = TeamLeague.objects.all()
