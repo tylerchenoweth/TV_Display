@@ -21,22 +21,31 @@
     <div class="row">
 
     {% for d1 in group %}
-    <div class="card col-md-2" style="margin:2px;">
+
+
+    <div class="card col-md-1" style="margin: 3px -2px 3px 3px">
         <ul class="list-group list-group-flush">
         
             <li class="list-group-item"> {{d1.Teams.Home}}</li>
             <li class="list-group-item"> {{d1.Teams.Away}} </li>
+        </ul></div>
+        <div class="card col-md-1" style="margin: 3px 3px 3px -2px">
+    
+        <ul class="list-group list-group-flush text-center">
             <li class="list-group-item"> 
-                {{d1.Date_Time.Day_of_Week}},
+                {{d1.Date_Time.Day_of_Week}}, <br>
                 {{d1.Date_Time.Month}} -
                 {{d1.Date_Time.Day}} -
-                {{d1.Date_Time.Year}}
+                {{d1.Date_Time.Year}} <br> 
                 {{d1.Date_Time.Hour}} :
-                {{d1.Date_Time.Minute}}
-            </li>
-        
+                {% spaceless %}
+                {{d1.Date_Time.Minute_0}}{{d1.Date_Time.Minute_1}}
+                {% endspaceless %}
+            </li>      
         </ul>
     </div>
+
+
     {% endfor %}
 
     </div>
