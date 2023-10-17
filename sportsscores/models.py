@@ -107,7 +107,8 @@ class League(models.Model):
         time_chunks['Month'] = int(unformattedTime[5:7])
         time_chunks['Day'] = int(unformattedTime[8:10])
         time_chunks['Hour'] = int(unformattedTime[11:13])
-        time_chunks['Minute'] = int(unformattedTime[14:16])
+        time_chunks['Minute_0'] = int(unformattedTime[14:15])
+        time_chunks['Minute_1'] = int(unformattedTime[15:16])
         time_chunks['Day_of_Week'] = given_date.strftime("%A")
 
         time_chunks = self.adjust_timezone( time_chunks, 4)
