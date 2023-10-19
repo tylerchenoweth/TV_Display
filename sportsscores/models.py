@@ -138,7 +138,8 @@ class League(models.Model):
         time_chunks['Month'] = int(unformattedTime['date'][5:7])
         time_chunks['Day'] = int(unformattedTime['date'][8:10])
         time_chunks['Hour'] = int(unformattedTime['time'][0:2])
-        time_chunks['Minute'] = int(unformattedTime['time'][3:5])
+        time_chunks['Minute_0'] = int(unformattedTime['time'][3:4])
+        time_chunks['Minute_1'] = int(unformattedTime['time'][4:5])
         time_chunks['Day_of_Week'] = given_date.strftime("%A")
 
         time_chunks = self.adjust_timezone( time_chunks, 4)
@@ -224,6 +225,24 @@ class League(models.Model):
         return unique_game_list
 
     
+    def abbreviate_long_team_names(self, games):
+
+        long_team_names = {
+            "Manchester City" : "Man City",
+            "Manchester United" : "Man United",
+            "Nottingham Forest" : "Nottm Forest",
+        }
+
+        for g in games:
+            if(g['Teams']['Home'] in long_team_names):
+                g['Teams']['Home'] = long_team_names[g['Teams']['Home']]
+            if(g['Teams']['Away'] in long_team_names):
+                g['Teams']['Away'] = long_team_names[g['Teams']['Away']]
+
+        return games
+
+
+
     def get_next_games_display(self):
 
         # Format the raw json for each individual game into a dict
@@ -246,6 +265,8 @@ class League(models.Model):
                 "Date_Time" : date_time
             }
 
+            
+
             return formatted_json
 
 
@@ -263,6 +284,7 @@ class League(models.Model):
                 format_game( something )
             )
 
+        formatted_games_list = self.abbreviate_long_team_names(formatted_games_list)
 
         return formatted_games_list
 
