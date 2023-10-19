@@ -1,0 +1,35 @@
+body {
+    background-color: blue;
+    padding: 30px;
+}
+
+h1 {
+    color: blue;
+}
+
+
+
+
+
+
+
+.card {
+  font-size:12px;
+}
+
+.group .row .card-left {
+  margin: 3px -2px 3px 3px;
+  
+
+}
+
+.group .row .card-right {
+  margin: 3px  3px 3px -2px;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+  
+}
+
+.group .card-right .list-group-item {
+  padding: 0px;
+}

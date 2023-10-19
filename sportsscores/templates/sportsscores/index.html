@@ -15,42 +15,92 @@
 
 
 
+<div class="row">
 
+    <div class="col-md-6">
 {% for group in Premier_League|group_in_threes %}
   <div class="group">
     <div class="row">
 
     {% for d1 in group %}
-
-
-    <div class="card col-md-1" style="margin: 3px -2px 3px 3px">
-        <ul class="list-group list-group-flush">
-        
-            <li class="list-group-item"> {{d1.Teams.Home}}</li>
-            <li class="list-group-item"> {{d1.Teams.Away}} </li>
-        </ul></div>
-        <div class="card col-md-1" style="margin: 3px 3px 3px -2px">
-    
-        <ul class="list-group list-group-flush text-center">
-            <li class="list-group-item"> 
-                {{d1.Date_Time.Day_of_Week}}, <br>
-                {{d1.Date_Time.Month}} -
-                {{d1.Date_Time.Day}} -
-                {{d1.Date_Time.Year}} <br> 
-                {{d1.Date_Time.Hour}} :
-                {% spaceless %}
-                {{d1.Date_Time.Minute_0}}{{d1.Date_Time.Minute_1}}
-                {% endspaceless %}
-            </li>      
-        </ul>
-    </div>
-
-
+        <div class="card card-left col-md-2" >
+            <ul class="list-group list-group-flush card-left">
+                <li class="list-group-item"> {{d1.Teams.Home}}</li>
+                <li class="list-group-item"> {{d1.Teams.Away}} </li>
+            </ul>
+        </div>
+        <div class="card card-right col-md-1"  >
+            <ul class="list-group list-group-flush text-center card-right">
+                <li class="list-group-item  card-data-date" > 
+                    {{d1.Date_Time.Day_of_Week}}, <br>
+                    {{d1.Date_Time.Month}} -
+                    {{d1.Date_Time.Day}} -
+                    {{d1.Date_Time.Year}} <br> 
+                    {{d1.Date_Time.Hour}} :
+                    {% spaceless %}
+                    {{d1.Date_Time.Minute_0}}{{d1.Date_Time.Minute_1}}
+                    {% endspaceless %}
+                </li>      
+            </ul>
+        </div>
     {% endfor %}
 
     </div>
   </div>
 {% endfor %}
+</div>
+
+
+
+<div class="col-md-6">
+{% for group in NFL|group_in_threes %}
+  <div class="group">
+    <div class="row">
+
+    {% for d1 in group %}
+        <div class="card col-md-2" style="margin: 3px -2px 3px 3px">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item card-data"> {{d1.Teams.Home}}</li>
+                <li class="list-group-item card-data"> {{d1.Teams.Away}} </li>
+            </ul>
+        </div>
+        <div class="card col-md-2" style="margin: 3px 3px 3px -2px">
+            <ul class="list-group list-group-flush text-center">
+                <li class="list-group-item card-data card-data-date"> 
+                    {{d1.Date_Time.Day_of_Week}}, <br>
+                    {{d1.Date_Time.Month}} -
+                    {{d1.Date_Time.Day}} -
+                    {{d1.Date_Time.Year}} <br> 
+                    {{d1.Date_Time.Hour}} :
+                    {% spaceless %}
+                    {{d1.Date_Time.Minute_0}}{{d1.Date_Time.Minute_1}}
+                    {% endspaceless %}
+                </li>      
+            </ul>
+        </div>
+    {% endfor %}
+</div>
+    </div>
+  
+{% endfor %}
+</div>
+
+
+
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 <br><br><br>
 
