@@ -346,6 +346,7 @@ def index(request):
 
     context['deuce'] = deuce
     context['Premier_League'] = stage_context['Premier_League']
+    context['NFL'] = stage_context['NFL']
 
 
     teamleague = TeamLeague.objects.all()
