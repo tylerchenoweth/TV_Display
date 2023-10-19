@@ -76,7 +76,7 @@ class League(models.Model):
                     time_chunks['Month'] = 12
                     time_chunks['Year'] -= 1
 
-                time_chunks['Day'] = days_in_month[ time_chunks['Day'] ]
+                time_chunks['Day'] = days_in_month[ time_chunks['Month'] ]
 
         return time_chunks
 
