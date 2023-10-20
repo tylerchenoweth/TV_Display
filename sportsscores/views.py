@@ -16,284 +16,284 @@ from .models import League, Team, TeamLeague
 
 timezone = pytz.timezone('America/New_York')
 
+from itertools import zip_longest
 
-def format_time_soccer(unformattedTime):
-    print("FORMATTED TIME\n\n\n\n\n\n\n")
+from datetime import datetime
+import pytz
 
-    print("Current Time: ", datetime.now() )
 
-    print("Unformatted Time: ", unformattedTime)
 
-    time_chunks = {}
 
-    time_chunks['Year'] = unformattedTime[0:4]
-    time_chunks['Month'] = unformattedTime[5:7]
-    time_chunks['Day'] = unformattedTime[8:10]
-    time_chunks['Hour'] = unformattedTime[11:13]
-    time_chunks['Minute'] = unformattedTime[14:16]
 
+
+
+
+
+
+
+
+
+
+def adjust_timezone(time_chunks, time_offset):
+    days_in_month = {
+        1 : 31,
+        2 : 28,
+        3 : 31,
+        4 : 30,
+        5 : 31,
+        6 : 30,
+        7 : 31,
+        8 : 31,
+        9 : 30,
+        10 : 31,
+        11 : 30,
+        12 : 31
+    }
+
+    time_chunks['Hour'] -= time_offset
+
+    if time_chunks['Hour'] < 0:
+        time_chunks['Hour'] %= 24
+        time_chunks['Day'] -= 1
+
+        if time_chunks['Day'] <= 0:
+            time_chunks['Month'] -= 1
+
+            if time_chunks['Month'] <= 0:
+                time_chunks['Month'] = 12
+                time_chunks['Year'] -= 1
+
+            time_chunks['Day'] = days_in_month[ time_chunks['Month'] ]
 
     return time_chunks
 
-def get_game_status(timestamp):
-    print("Getting status... ")
+def get_day_of_week(given_date):
+    import datetime
+    import calendar
 
+# Format the time for the game into a dictionary
+def format_time_soccer(unformattedTime ):
+
+    import datetime
+    import calendar
+
+    time_chunks = {}
+
+    given_date = datetime.date(
+        int(unformattedTime[0:4]),
+        int(unformattedTime[5:7]),
+        int(unformattedTime[8:10])
+    )
+
+    # Soccer Time Format:
+    #   2023-08-11T19:00:00+00:00
+
+    # The int() is to convert the json into int so it
+    #   can be compared to the current time dict
+    time_chunks['Year'] = int(unformattedTime[0:4])
+    time_chunks['Month'] = int(unformattedTime[5:7])
+    time_chunks['Day'] = int(unformattedTime[8:10])
+    time_chunks['Hour'] = int(unformattedTime[11:13])
+    time_chunks['Minute_0'] = int(unformattedTime[14:15])
+    time_chunks['Minute_1'] = int(unformattedTime[15:16])
+    time_chunks['Day_of_Week'] = given_date.strftime("%A")
+
+    time_chunks = adjust_timezone( time_chunks, 4)
+
+    return time_chunks
+
+
+def format_time_football(unformattedTime):
+
+    import datetime
+    import calendar
+    
+    time_chunks = {}
+
+    given_date = datetime.date(
+        int(unformattedTime['date'][0:4]),
+        int(unformattedTime['date'][5:7]),
+        int(unformattedTime['date'][8:10])
+    )
+
+    # Soccer Time Format:
+    #   2023-08-11T19:00:00+00:00
+
+    # The int() is to convert the json into int so it
+    #   can be compared to the current time dict
+    time_chunks['Year'] = int(unformattedTime['date'][0:4])
+    time_chunks['Month'] = int(unformattedTime['date'][5:7])
+    time_chunks['Day'] = int(unformattedTime['date'][8:10])
+    time_chunks['Hour'] = int(unformattedTime['time'][0:2])
+    time_chunks['Minute_0'] = int(unformattedTime['time'][3:4])
+    time_chunks['Minute_1'] = int(unformattedTime['time'][4:5])
+    time_chunks['Day_of_Week'] = given_date.strftime("%A")
+
+    time_chunks = adjust_timezone( time_chunks, 4)
+
+    return time_chunks
+
+
+# Send a game schedule to determine if the game is 
+#   in the future 
+def is_future_game(current_time, game_time):
+    
+    is_future_game = False
+
+    if( current_time['Year'] < game_time['Year'] ):
+        return True
+    elif( current_time['Year'] == game_time['Year'] ):  
+        if( current_time['Month'] < game_time['Month'] ):
+            return True
+        elif( current_time['Month'] == game_time['Month'] ):
+            if( current_time['Day'] < game_time['Day'] ):
+                return True
+            elif( current_time['Day'] == game_time['Day'] ):
+                if( current_time['Hour'] < game_time['Hour'] ):
+                    return True
+                elif( current_time['Hour'] == game_time['Hour'] ):
+                    if( current_time['Minute'] <= game_time['Minute'] ):
+                        return True
+    return False
+
+
+
+
+
+
+def get_next_games_raw_json( raw_league_schedule, sport ):
+    print("Finding next games...")
+
+    # Get the current date and time
     current_time = datetime.now()
 
-    print( current_time )
-    print( current_time.day )
+    # Breakdown the current date and time into dictionary keys
+    current_time_chunks = {}
+    current_time_chunks['Year'] = current_time.year
+    current_time_chunks['Month'] = current_time.month
+    current_time_chunks['Day'] = current_time.day
+    current_time_chunks['Hour'] = current_time.hour
+    current_time_chunks['Minute'] = current_time.minute
+    
 
-    print( type( int(timestamp['Year']) ) )
-    print( type(current_time.year) )
+    all_team_IDs = []
+    all_next_games = []
 
-    print( timestamp['Year'] )
-    print( current_time.year )
+    # Get all team IDs
+    for j in raw_league_schedule:
+        if j['teams']['home']['id'] != 0 and j['teams']['away']['id'] != 0:
+            if j['teams']['home']['id'] not in all_team_IDs:
+                all_team_IDs.append( j['teams']['home']['id'] )
+            if j['teams']['away']['id'] not in all_team_IDs:
+                all_team_IDs.append( j['teams']['away']['id'] )
 
-    print( current_time.hour)
-    print( int(timestamp['Hour'])-4)
+    print("ALL NEXT GAMES \n\n")
+    print(all_team_IDs)
 
-    if( current_time.year == int( timestamp['Year'] ) and current_time.month == int( timestamp['Month'] ) ):
-        # If it is the day before
-        if( current_time.day < int( timestamp['Day'] )  ):
-            return "Tomorrow"
-        # If the game is today
-        elif( current_time.day == int( timestamp['Day'] ) ):
-            
-            if( current_time.hour == int(timestamp['Hour'])-4  and current_time.minute >= int(timestamp['Minute']) ):
-                return "Now"
-            elif( current_time.hour == (int(timestamp['Hour'])-4 + 1) ):
-                return "Now"
-            elif( current_time.hour == (int(timestamp['Hour'])-4 + 2)  and current_time.minute < int(timestamp['Minute']) ):
-                return "Now"
-            else:
-                return "TodayAndOver"
+    # Get the next game for each team
+    for team_ID in all_team_IDs:
+        for game in raw_league_schedule:
+            if( game['teams']['home']['id'] == team_ID or game['teams']['away']['id'] == team_ID ):
+                
+                if( sport == "SOCCER"):
+                    game_time_chunks = format_time_soccer( game['fixture']['date'] )
+                elif( sport == "FOOTBALL"):
+                    game_time_chunks = format_time_football( game['game']['date'] )
+                    
+                if( is_future_game( current_time_chunks, game_time_chunks ) ):
+                    all_next_games.append( game )
+                    
+                    break
 
-    else:
-        return "Meh"
+    # Filter the duplicate games out of the list
+    unique_game_list = [item for index, item in enumerate(all_next_games) if item not in all_next_games[:index]]
+
+    # Return next games in raw json form
+    return unique_game_list
 
 
-def download_schedule():
-    # The code below will fetch the data from the API
-    url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
+def abbreviate_long_team_names(games):
 
-    querystring = {"league":39,"season":"2023"}
-
-    headers = {
-        "X-RapidAPI-Key": "1e3ccc2439msh0e41508573472b1p12951ejsnbb3a79fa2ed1",
-        "X-RapidAPI-Host": "api-football-v1.p.rapidapi.com"
+    long_team_names = {
+        "Manchester City" : "Man City",
+        "Manchester United" : "Man United",
+        "Nottingham Forest" : "Nottm Forest",
     }
 
-    response = requests.request("GET", url, headers=headers, params=querystring)
+    for g in games:
+        if(g['Teams']['Home'] in long_team_names):
+            g['Teams']['Home'] = long_team_names[g['Teams']['Home']]
+        if(g['Teams']['Away'] in long_team_names):
+            g['Teams']['Away'] = long_team_names[g['Teams']['Away']]
+
+    return games
+
+
+
+def get_next_games_display(league_obj):
+
+    # Format the raw json for each individual game into a dict
+    def format_game(raw_json):
+
+        date_time = {}
+
+        if( league_obj.sport == "SOCCER"):
+            date_time = format_time_soccer( raw_json['fixture']['date'] )
+        elif( league_obj.sport == "FOOTBALL"):
+            date_time = format_time_football( raw_json['game']['date'] )
+
+        formatted_json = {
+            "Display_Name" : league_obj.name,
+            "Teams" : {
+                "Home" : raw_json['teams']['home']['name'],
+                "Away" : raw_json['teams']['away']['name'],
+            },
+
+            "Date_Time" : date_time
+        }
+
+        
+
+        return formatted_json
+
+
+
+
+
+    # Get the raw JSON of all the next games (game list is unique)
+    next_game_raw_json_list = get_next_games_raw_json(league_obj.json_data, league_obj.sport)
+    formatted_games_list = []
+
     
+    # Format the games into a dictionary to be displayed on the template
+    for something in next_game_raw_json_list:
+        formatted_games_list.append(
+            format_game( something )
+        )
 
-# These are temporary functions to load data
-#   into the models for 'testing'
-def load_league_json_into_class():
-    print("Loading NFL data...")
-    f = open( 'NFL_Schedule.json')
-    data = json.load( f )
-    new_object = League(api_id=1, name="NFL", sport="FOOTBALL", json_data=data)
-    new_object.save()
-    print("Loading NFL...")
+    formatted_games_list = abbreviate_long_team_names(formatted_games_list)
 
-
-    print("Loading data")
-    f = open( 'PremierLeague.json')
-    data = json.load( f )
-    #new_object = League(api_id=39, name="Premier League", json_data=data)
-    #new_object.save()
-    print("Loading Premier League...")
-
-def load_team_json_into_class():
-    new_object = Team(name="Chelsea", sport="SOCCER")
-    new_object.save()
-
-def load_teamleague():
-    team = Team.objects.get(pk=1)
-    league = League.objects.get(pk=32)
-    team_api_id = 49
-
-    all_games = league.json_data
-    chelsea_games = []
-    
-    for game in all_games:
-        if( game['teams']['home']['id'] == 49 or game['teams']['away']['id'] == 49):
-            chelsea_games.append(game)
-    
-
-    new_object = TeamLeague(team=team, league=league, team_api_id=49, json_data=chelsea_games)
-    new_object.save()
+    #return formatted_games_list
+    league_obj.set_game_details( formatted_games_list )
 
 
 
 
-from itertools import zip_longest
+
+
+
+
+
+
+
+
+
+
 
 
 # Create your views here.
 def index(request):
 
-
-    #load_team_json_into_class()
-
-
-
-    #formattedTime = formatTime( data[0]['fixture']['date'] )
-
-    
-
-    #print( formattedTime )
-
-    #get_game_status(formattedTime)
-
-    count = 0
-
-    """ # Load Chelsea games into the dict
-    for d in data:
-        if( d['teams']['home']['id'] == 45 or d['teams']['away']['id'] == 45 ):
-
-            
-
-            
-
-            formattedTime = format_time_soccer( d['fixture']['date'] )
-            status = get_game_status( formattedTime )
-
-            print("GAME STATUS: ", status)
-
-            tmp_dict = {
-    
-                'home_team': d['teams']['home']['name'],
-                'away_team': d['teams']['away']['name'],
-                'home_score': d['goals']['home'],
-                'away_score': d['goals']['away'],
-                'date': d['fixture']['date'],
-                'status': status
-
-            }
-            context_array.append(tmp_dict)
-            count += 1
-
-            if( count >= 5 ):
-                break
-    """
-
-    """
-    # Load Chelsea games into the dict
-    
-        
-    team_IDs = []
-
-    # Get list of all team id's
-    for d in data:
-        if( d['teams']['home']['id'] not in team_IDs and d['teams']['home']['id'] != 0):
-            team_IDs.append( int( d['teams']['home']['id'] ) )
-
-            if( len( team_IDs ) >= 32 ):
-                break
-    
-    NFL_next_games = []
-
-    Short_Finish_Codes = ['FT', 'AOT']
-    Long_Finish_Codes = ['Final/OT', 'Finished', 'After Over Time']
-
-
-    # Get every teams next game
-    for ID in team_IDs:
-        for d in data:
-            
-            if( d['game']['status']['long'] not in Long_Finish_Codes ):
-                if( d['teams']['home']['id'] == ID ):
-                    if( d not in NFL_next_games ):
-                        NFL_next_games.append( d )
-                    break
-                elif( d['teams']['away']['id'] == ID ):
-                    if( d not in NFL_next_games ):
-                        NFL_next_games.append( d )
-                    break
-
-
-    print( "NFL_next_games: ", len( NFL_next_games ) )
-    print( "LENGHT: ", len(team_IDs))
-    print( team_IDs )
-
-    # Load next NFL games into the dict
-    for d in NFL_next_games:
-
-        #formattedTime = format_time_soccer( d['fixture']['date'] )
-        #status = get_game_status( formattedTime )
-
-        tmp_dict = {
-
-            'home_team': d['teams']['home']['name'],
-            'away_team': d['teams']['away']['name'],
-            'home_score': d['scores']['home']['total'],
-            'away_score': d['scores']['away']['total'],
-            'date': d['game']['date']['date'],
-            'time': d['game']['date']['time'],
-            'week': d['game']['week']
-
-        }
-        context_array.append(tmp_dict)
-        count += 1
-
-        #if( count >= 5 ):
-        #    break
-    
-
-
-    #print(context_array)
-
-    sorted_context_array = sorted( context_array, key=lambda x: x['date'])
-           
-
-    context = {
-        "Premier_League_Chelsea_Games" : sorted_context_array
-    }
-
-    """
-
-    #load_json_into_class()
-    
-
-
-    f = open( 'PremierLeague.json')
-    data = json.load( f )
-    pretty_schedule = json.dumps(data, indent=4)
-
-
-
-    #response = requests.request("GET", url_soccer, headers=headers_soccer, params=querystring_soccer)
-
-    #data = json.loads( response.text )
-
-    #print( pretty_schedule )
-    #print("\n\n\n\n\n\n\n\n\n")
-
-    #ew_object = League(api_id=39, name="Premier League", sport="Soccer", json_data=data )
-    
-
-
-
-
-    """j = League.objects.latest('pk')
-
-    all_d = j.json_data
-
-    
-    for i in all_d:
-        if( i['teams']['home']['id'] == 49 or i['teams']['away']['id'] == 49):
-            print( "From OBJECTC: \n\n", i , "\n\n\n\n\n\n\n")
-    """
-
-
-    """context = {
-        "Json_Data" : j
-    }"""
-
-
-    #load_teamleague()
-    #load_league_json_into_class()
 
     print("##################### START INDEX #####################")
     context = {}
@@ -306,58 +306,39 @@ def index(request):
 
     stage_context = {}
 
-
-
-
-
+    # Get the league objects and load them into context
     for league in leagues:
 
-        games = league.get_next_games_display()
+        # Update game_details dict
+
+        # Get the raw league schedule
+        raw_league_schedule = league.get_raw_league_schedule()
+
+        # Format the raw json and find the next game
+        get_next_games_display( league )
+
+        # Get next games dict
+        games = league.get_game_details()
+
+        # Add dict to staging area
         stage_context[league.get_dict_key_name()] = games
 
-        print( games[0]['Date_Time'] )
+      
 
         
-        given_date = datetime.date(    
-            games[0]['Date_Time']['Year'],
-            games[0]['Date_Time']['Month'],
-            games[0]['Date_Time']['Day']
-        )
-
-        print("\n\n\n\n\n\n\n",type(games[0]['Date_Time']['Year']),"\n\n\n\n\n\n\n\n\n")
-
-        day_of_week = given_date.weekday()
-        day_name = given_date.strftime("%A")
         
-        #print()
-        
-
-        #day = datetime.datetime.strptime(date, )
 
 
         
     
     # This is hard coded but it needs to be changed once more leagues are added in
-    deuce = zip_longest( stage_context['Premier_League'], stage_context['NFL'], fillvalue=None )
+    #deuce = zip_longest( stage_context['Premier_League'], stage_context['NFL'], fillvalue=None )
+    #context['deuce'] = deuce
 
-    """print("\n\n\n\n\n\n\n")
-    print(deuce)
-    print("\n\n\n\n\n\n\n")"""
 
-    context['deuce'] = deuce
     context['Premier_League'] = stage_context['Premier_League']
     context['NFL'] = stage_context['NFL']
 
-
-    teamleague = TeamLeague.objects.all()
-
-    for team in teamleague:
-        context[team.get_dict_key_name()] = team.get_next_game()
-    
-    
-
-    #print("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\nPrinting context")
-    #print( context )
 
     print("##################### END INDEX #######################")
     return render(request, "sportsscores/index.html", context)
