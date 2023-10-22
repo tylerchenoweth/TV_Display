@@ -85,6 +85,31 @@ def format_time_soccer(unformattedTime ):
         int(unformattedTime[8:10])
     )
 
+    day_of_week_abbreviation = {
+        "Sunday" : "Sun",
+        "Monday" : "Mon",
+        "Tuesday" : "Tue",
+        "Wednesday" : "Wed",
+        "Thursday" : "Thu",
+        "Friday" : "Fri",
+        "Saturday" : "Sat",
+    }
+
+    num_to_month = {
+        1 : "Jan",
+        2 : "Feb",
+        3 : "Mar",
+        4 : "Apr",
+        5 : "May",
+        6 : "Jun",
+        7 : "Jul",
+        8 : "Aug",
+        9 : "Sep",
+        10 : "Oct",
+        11 : "Nov",
+        12 : "Dec",
+    }
+
     # Soccer Time Format:
     #   2023-08-11T19:00:00+00:00
 
@@ -92,11 +117,12 @@ def format_time_soccer(unformattedTime ):
     #   can be compared to the current time dict
     time_chunks['Year'] = int(unformattedTime[0:4])
     time_chunks['Month'] = int(unformattedTime[5:7])
+    time_chunks['Month_Name'] = num_to_month[ int(unformattedTime[5:7]) ]
     time_chunks['Day'] = int(unformattedTime[8:10])
     time_chunks['Hour'] = int(unformattedTime[11:13])
     time_chunks['Minute_0'] = int(unformattedTime[14:15])
     time_chunks['Minute_1'] = int(unformattedTime[15:16])
-    time_chunks['Day_of_Week'] = given_date.strftime("%A")
+    time_chunks['Day_of_Week'] = day_of_week_abbreviation[ given_date.strftime("%A") ]
 
     time_chunks = adjust_timezone( time_chunks, 4)
 
