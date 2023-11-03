@@ -12,7 +12,7 @@ import calendar
 
 import pytz
 
-from .models import League, Team, TeamLeague
+from .models import League, Team
 
 timezone = pytz.timezone('America/New_York')
 
@@ -151,6 +151,7 @@ def format_time_football(unformattedTime):
     time_chunks['Month'] = int(unformattedTime['date'][5:7])
     time_chunks['Day'] = int(unformattedTime['date'][8:10])
     time_chunks['Hour'] = int(unformattedTime['time'][0:2])
+    time_chunks['Minute'] = int(unformattedTime['time'][3:5])
     time_chunks['Minute_0'] = int(unformattedTime['time'][3:4])
     time_chunks['Minute_1'] = int(unformattedTime['time'][4:5])
     time_chunks['Day_of_Week'] = given_date.strftime("%A")
@@ -275,7 +276,8 @@ def get_next_games_display(league_obj):
                 "Away" : raw_json['teams']['away']['name'],
             },
 
-            "Date_Time" : date_time
+            "Date_Time" : date_time,
+            "Logo" : league_obj.logo
         }
 
         
@@ -307,8 +309,46 @@ def get_next_games_display(league_obj):
 
 
 
+from pathlib import Path
+
+def download_logo(image_url):
+    print("HERE")
+    try:
+        response = requests.get(image_url)
+        response.raise_for_status()  # Check for any HTTP request errors
+
+        # Extract the file extension from the URL (e.g., .jpg, .png) to create a local filename.
+        file_extension = image_url.split('.')[-1]
+        local_filename = 'downloaded_image.' + file_extension
+        
+        full_path_and_image = (str(Path.home()) + '/TV_Display/media/logos_folder/' + local_filename)
+        print(full_path_and_image)
+        with open(full_path_and_image, 'wb') as file:
+            file.write(response.content)
+            
+
+        print(f"Image downloaded as '{local_filename}'")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to download the image: {e}")
 
 
+# Load Games
+def get_JSON():
+    path = open( str(Path.home()) + '/TV_Display/PremierLeague.json')
+
+    data = json.load(path)
+
+    print(data)
+
+    print("api_id: ", data[0]['league']['id'])
+    print("name: ", data[0]['league']['name'])
+    print("sport: SOCCER")
+    print("json_data: ", """data""")
+    print("game_details: to be calculated...")
+    print("logo: ", data[0]['league']['logo'])
+
+    download_logo(data[0]['league']['logo'])
 
 
 
@@ -320,11 +360,13 @@ def get_next_games_display(league_obj):
 # Create your views here.
 def index(request):
 
+    get_JSON()
+
 
     print("##################### START INDEX #####################")
     context = {}
 
-
+    """
     print("********************** LOADING PREMIER LEAGUE INTO CONTEXT ***********")
 
     # Load context with leagues
@@ -346,11 +388,13 @@ def index(request):
         # Get next games dict
         games = league.get_game_details()
 
+        print( games )
+
         # Add dict to staging area
         stage_context[league.get_dict_key_name()] = games
 
       
-
+    
         
         
 
@@ -364,6 +408,13 @@ def index(request):
 
     context['Premier_League'] = stage_context['Premier_League']
     context['NFL'] = stage_context['NFL']
+    
+    """
+
+
+
+
+    
 
 
     print("##################### END INDEX #######################")
