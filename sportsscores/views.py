@@ -12,7 +12,7 @@ import calendar
 
 import pytz
 
-from .models import League, Team, TeamLeague
+from .models import League, Team, Game
 
 timezone = pytz.timezone('America/New_York')
 
@@ -327,47 +327,11 @@ def index(request):
 
     print("********************** LOADING PREMIER LEAGUE INTO CONTEXT ***********")
 
-    # Load context with leagues
-    leagues = League.objects.all()
-
-    stage_context = {}
-
-    # Get the league objects and load them into context
-    for league in leagues:
-
-        # Update game_details dict
-
-        # Get the raw league schedule
-        raw_league_schedule = league.get_raw_league_schedule()
-
-        # Format the raw json and find the next game
-        get_next_games_display( league )
-
-        # Get next games dict
-        games = league.get_game_details()
-
-        # Add dict to staging area
-        stage_context[league.get_dict_key_name()] = games
-
-      
-
-        
-        
-
-
-        
     
-    # This is hard coded but it needs to be changed once more leagues are added in
-    #deuce = zip_longest( stage_context['Premier_League'], stage_context['NFL'], fillvalue=None )
-    #context['deuce'] = deuce
-
-
-    context['Premier_League'] = stage_context['Premier_League']
-    context['NFL'] = stage_context['NFL']
 
 
     print("##################### END INDEX #######################")
-    return render(request, "sportsscores/index.html", context)
+    return render(request, "sportsscores/index.html")
 
 
 
