@@ -23,10 +23,8 @@ import pytz
 
 
 
-
-
-
-
+import json
+import requests
 
 
 
@@ -308,6 +306,83 @@ def get_next_games_display(league_obj):
 
 
 
+def add_a_league_to_model():
+    league_id = 39
+    url = "https://api-american-football.p.rapidapi.com/games"
+
+    querystring = {"league":"1","season":"2023"}
+
+    """headers = {
+        "X-RapidAPI-Key": "1e3ccc2439msh0e41508573472b1p12951ejsnbb3a79fa2ed1",
+        "X-RapidAPI-Host": "api-american-football.p.rapidapi.com"
+    }
+
+    response = requests.get(url, headers=headers, params=querystring)
+    data = json.loads( response.text )
+    data = data['response']
+    pretty_schedule = json.dumps(data, indent=4)
+
+    #print(response.json())
+    print(pretty_schedule)"""
+
+    import json
+    from django.core.files.base import ContentFile
+
+    json_path = os.getcwd()+"/PremierLeague.json"
+    image_path = "/Users/tylerchenoweth/TV_Display/media/logos_folder/downloaded_image.png"
+
+    # Open the file and load its contents into a variable
+    with open(json_path, 'r') as file:
+        json_data = json.load(file)
+
+    #response = requests.get(image_url)
+
+    with open(image_path, 'rb') as image_file:
+        img = image_file.read()
+
+
+
+        # Create the league objects
+        league = League(
+            api_id = league_id,
+            api_source = url,
+            name = "Premier League",
+            sport="SOCCER",
+            raw_json=json_data
+            #logo=image_path
+        )
+
+
+
+        # Save the image content to the model's ImageField
+        league.logo.save(os.path.basename(image_path), ContentFile(img))
+
+
+    # Download a logo
+    """
+    from pathlib import Path
+    image_url = "https://media-4.api-sports.io/football/leagues/39.png"
+
+    try:
+        response = requests.get(image_url)
+        response.raise_for_status()  # Check for any HTTP request errors
+
+        # Extract the file extension from the URL (e.g., .jpg, .png) to create a local filename.
+        file_extension = image_url.split('.')[-1]
+        local_filename = 'downloaded_image.' + file_extension
+        
+        full_path_and_image = (str(Path.home()) + '/TV_Display/media/logos_folder/' + local_filename)
+        print(full_path_and_image)
+        with open(full_path_and_image, 'wb') as file:
+            file.write(response.content)
+            
+
+        print(f"Image downloaded as '{local_filename}'")
+
+    except requests.exceptions.RequestException as e:
+        print(f"Failed to download the image: {e}")
+
+    """
 
 
 
@@ -315,23 +390,29 @@ def get_next_games_display(league_obj):
 
 
 
-
-
+import os
 # Create your views here.
 def index(request):
 
 
     print("##################### START INDEX #####################")
+    
+    #add_a_league_to_model()
+
+
+    Premier_League = League.objects.get(pk=3)
+
+    print(Premier_League)
+    
+
     context = {}
 
-
-    print("********************** LOADING PREMIER LEAGUE INTO CONTEXT ***********")
+    context = {"Premier_League":Premier_League}
 
     
 
-
     print("##################### END INDEX #######################")
-    return render(request, "sportsscores/index.html")
+    return render(request, "sportsscores/index.html", context)
 
 
 
