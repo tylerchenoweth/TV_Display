@@ -306,10 +306,18 @@ def get_next_games_display(league_obj):
 
 
 
+
+
+
+
+#def check_league_exists():
+
+
+
 def add_a_league_to_model():
     league_id = 39
-    url = "https://api-american-football.p.rapidapi.com/games"
-
+    #url = "https://api-american-football.p.rapidapi.com/games"
+    url = "https://api-football-v1.p.rapidapi.com/v3/fixtures"
     querystring = {"league":"1","season":"2023"}
 
     """headers = {
@@ -337,25 +345,28 @@ def add_a_league_to_model():
 
     #response = requests.get(image_url)
 
-    with open(image_path, 'rb') as image_file:
-        img = image_file.read()
+    #with open(image_path, 'rb') as image_file:
+    #    img = image_file.read()
 
 
 
-        # Create the league objects
-        league = League(
-            api_id = league_id,
-            api_source = url,
-            name = "Premier League",
-            sport="SOCCER",
-            raw_json=json_data
-            #logo=image_path
-        )
+    # Create the league objects
+    league = League(
+        api_id = league_id,
+        api_source = url,
+        name = "Premier League",
+        sport="SOCCER",
+        json_data=json_data
+        #logo=image_path
+    )
+
+
+    league.save()
+    # Save the image content to the model's ImageField
+    #league.logo.save(os.path.basename(image_path), ContentFile(img))
 
 
 
-        # Save the image content to the model's ImageField
-        league.logo.save(os.path.basename(image_path), ContentFile(img))
 
 
     # Download a logo
@@ -387,6 +398,19 @@ def add_a_league_to_model():
 
 
 
+def get_next_Premier_League_games():
+    Premier_League = League.objects.last()
+
+    now = datetime.now()
+
+    print("Get Next Game\n----------------------\n\n")
+
+    print(now)
+
+    print(Premier_League.json_data[0]['fixture']['date'])
+
+
+    print("\n\n\nEnd Get Next Game---------------------\n\n")
 
 
 
@@ -400,16 +424,30 @@ def index(request):
     #add_a_league_to_model()
 
 
-    Premier_League = League.objects.get(pk=3)
+    Premier_League = League.objects.last()
 
-    print(Premier_League)
+    #print(Premier_League)
+
+    print( "api_id: ", Premier_League.api_id )
+    print( "api_source: ", Premier_League.api_source )
+    print( "name: ", Premier_League.sport )
+    print( "json_data: " )
+    print( "teams: ", Premier_League.teams.all )
+    print( "logo: ",  )
     
-
+    print("-----")
+    print(Premier_League.teams)
+    print("------")
+    for t in Premier_League.teams.all():
+        print(t.name)
+    print("END")
     context = {}
 
     context = {"Premier_League":Premier_League}
 
-    
+
+    get_next_Premier_League_games()
+
 
     print("##################### END INDEX #######################")
     return render(request, "sportsscores/index.html", context)
