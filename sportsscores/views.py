@@ -336,7 +336,7 @@ def add_a_league_to_model():
     import json
     from django.core.files.base import ContentFile
 
-    json_path = os.getcwd()+"/PremierLeague.json"
+    json_path = os.getcwd()+"/pl.json"
     image_path = "/Users/tylerchenoweth/TV_Display/media/logos_folder/downloaded_image.png"
 
     # Open the file and load its contents into a variable
@@ -396,18 +396,62 @@ def add_a_league_to_model():
     """
 
 
+def get_soccer_datetime_object(soccer_time_string):
 
+    soccer_time_string = soccer_time_string.replace('T',' ')
+    soccer_time_string = soccer_time_string[0:19]
+
+    date_format = "%Y-%m-%d %H:%M:%S"
+
+    # Convert the string to a datetime object
+    datetime_object = datetime.strptime(soccer_time_string, date_format)
+
+    return datetime_object
+
+def isFutureGame(datetime_string, sport):
+    if(sport == "SOCCER"):
+        if(get_soccer_datetime_object(datetime_string) >= datetime.now()):
+            return True
+        return False
+    return False
 
 def get_next_Premier_League_games():
     Premier_League = League.objects.last()
 
-    now = datetime.now()
+    
 
     print("Get Next Game\n----------------------\n\n")
 
-    print(now)
+    for team in Premier_League.teams.all():
+        api_id = team.api_id
 
-    print(Premier_League.json_data[0]['fixture']['date'])
+        for game in Premier_League.json_data:
+            if( game['teams']['home']['id'] == api_id or game['teams']['away']['id'] == api_id):
+                print("\n\n\n\n\n\n\nHERERERER\n\n\n\n\n")
+                if( get_soccer_datetime_object(game['fixture']['date']) >= datetime.now()):
+                    new_game = Game(
+                        home_team = Team.objects.get(api_id=int(game['teams']['home']['id'])),
+                        away_team = Team.objects.get(api_id=int(game['teams']['away']['id'])),
+                        league = League.objects.get(pk=Premier_League.pk),
+                        date = get_soccer_datetime_object(game['fixture']['date'])                                                                      
+                    )
+                    print(new_game)
+                    new_game.save()
+
+                    break
+                    
+
+
+    """for i in Premier_League.json_data:
+        game_date = i['fixture']['date']
+        print(game_date, end=": ")
+        if( get_soccer_daetime_object(game_date) > datetime.now() ):
+            print("Future")
+        else:
+            print("Past")
+    """
+    
+
 
 
     print("\n\n\nEnd Get Next Game---------------------\n\n")
@@ -446,8 +490,16 @@ def index(request):
     context = {"Premier_League":Premier_League}
 
 
-    get_next_Premier_League_games()
+    #get_next_Premier_League_games()
+    print("---> ",Premier_League.pk)
 
+    all_future_games = Game.objects.all()
+
+    for game in all_future_games:
+        print(game.home_team, " v ", game.away_team)
+        print(game.league)
+        print(game.date)
+        print("")
 
     print("##################### END INDEX #######################")
     return render(request, "sportsscores/index.html", context)
