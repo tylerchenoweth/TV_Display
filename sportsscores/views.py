@@ -415,19 +415,21 @@ def isFutureGame(datetime_string, sport):
         return False
     return False
 
+from django.db.models import Count,F
+
 def get_next_Premier_League_games():
     Premier_League = League.objects.last()
 
     
 
     print("Get Next Game\n----------------------\n\n")
-
+    all_games = Game.objects.all()
+    all_games.delete()
     for team in Premier_League.teams.all():
         api_id = team.api_id
 
         for game in Premier_League.json_data:
             if( game['teams']['home']['id'] == api_id or game['teams']['away']['id'] == api_id):
-                print("\n\n\n\n\n\n\nHERERERER\n\n\n\n\n")
                 if( get_soccer_datetime_object(game['fixture']['date']) >= datetime.now()):
                     new_game = Game(
                         home_team = Team.objects.get(api_id=int(game['teams']['home']['id'])),
@@ -435,12 +437,13 @@ def get_next_Premier_League_games():
                         league = League.objects.get(pk=Premier_League.pk),
                         date = get_soccer_datetime_object(game['fixture']['date'])                                                                      
                     )
-                    print(new_game)
-                    new_game.save()
 
-                    break
                     
+                    new_game.save()
+                    break
 
+                    
+    
 
     """for i in Premier_League.json_data:
         game_date = i['fixture']['date']
@@ -457,7 +460,7 @@ def get_next_Premier_League_games():
     print("\n\n\nEnd Get Next Game---------------------\n\n")
 
 
-
+from django.db import models
 import os
 # Create your views here.
 def index(request):
@@ -490,16 +493,67 @@ def index(request):
     context = {"Premier_League":Premier_League}
 
 
-    #get_next_Premier_League_games()
-    print("---> ",Premier_League.pk)
 
-    all_future_games = Game.objects.all()
+    get_next_Premier_League_games()
 
-    for game in all_future_games:
+
+
+    
+
+
+    #print(duplicate_objects)
+    print("DUPLICATES\n-------------------\n\n\n")
+    
+    
+
+    # Identify the fields you want to check for duplicates
+    fields_to_check = ['home_team', 'away_team','date']
+
+    
+    all_games = Game.objects.all()
+    
+    unique_list = list(set(all_games))
+
+    count = 1
+
+    duplicates = (Game.objects
+                  .values('home_team', 'away_team', 'date')
+                  .annotate(count=models.Count('id'))
+                  .filter(count__gt=1))
+
+    # Iterate over duplicates and keep only the first object
+    for duplicate in duplicates:
+        # Get all objects with the same values
+        duplicate_objects = Game.objects.filter(home_team=duplicate['home_team'], away_team=duplicate['away_team'], date=duplicate['date'])
+
+        # Keep the first object and delete the rest
+        for obj in duplicate_objects[1:]:
+            obj.delete()
+
+    no_dups = Game.objects.all()
+    for game in no_dups:
         print(game.home_team, " v ", game.away_team)
         print(game.league)
         print(game.date)
         print("")
+        
+    
+
+    #duplicate_objects.delete()
+
+    print("###############################\n\n\n")
+    """for game in all_future_games:
+        print(game.home_team, " v ", game.away_team)
+        print(game.league)
+        print(game.date)
+        print("")
+        """
+
+
+
+
+    
+
 
     print("##################### END INDEX #######################")
     return render(request, "sportsscores/index.html", context)
