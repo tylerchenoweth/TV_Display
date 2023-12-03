@@ -84,6 +84,9 @@ class Game(models.Model):
     league = models.ForeignKey(League, on_delete=models.CASCADE)
     date = models.DateTimeField()
 
+    def __str__(self):
+        return f"{self.date.strftime('%Y-%m-%d %H:%M:%S')}"
+
 
 
 from django.db.models.signals import post_save
